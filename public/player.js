@@ -38,6 +38,9 @@ class WinampPlayer {
       const response = await fetch('/api/playlists');
       const playlists = await response.json();
       
+      // Sort albums chronologically by year (newest to oldest)
+      playlists.sort((a, b) => b.year - a.year);
+      
       this.albumSelect.innerHTML = '<option value="">Select an album...</option>';
       playlists.forEach(playlist => {
         const option = document.createElement('option');
