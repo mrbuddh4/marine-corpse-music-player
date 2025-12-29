@@ -38,8 +38,8 @@ class WinampPlayer {
       const response = await fetch('/api/playlists');
       const playlists = await response.json();
       
-      // Sort albums chronologically by year (newest to oldest)
-      playlists.sort((a, b) => b.year - a.year);
+      // Sort albums chronologically by year (oldest to newest)
+      playlists.sort((a, b) => a.year - b.year);
       
       this.albumSelect.innerHTML = '<option value="">Select an album...</option>';
       playlists.forEach(playlist => {
@@ -50,6 +50,12 @@ class WinampPlayer {
       });
       
       this.playlists = playlists;
+      
+      // Auto-select first album
+      if (playlists.length > 0) {
+        this.albumSelect.value = playlists[0].id;
+        this.selectAlbum(playlists[0].id);
+      }
     } catch (error) {
       console.error('Failed to load playlists:', error);
     }
