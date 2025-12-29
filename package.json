@@ -1,0 +1,24 @@
+{
+  "name": "winamp-music-player",
+  "version": "1.0.0",
+  "description": "A Winamp-style music player web app",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "generate": "node scripts/generate-playlists.js"
+  },
+  "keywords": [
+    "music",
+    "player",
+    "winamp"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "music-metadata": "^11.10.3"
+  }
+}

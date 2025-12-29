@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marine Corpse Music Player</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="player-container">
+    <!-- Main Window -->
+    <div class="main-window">
+      <!-- Title Bar -->
+      <div class="title-bar">
+        <div class="title-text">Marine Corpse Music Player</div>
+        <div class="title-buttons">
+          <button class="minimize-btn">_</button>
+          <button class="close-btn">×</button>
+        </div>
+      </div>
+
+      <!-- Album Art Display -->
+      <div class="album-display">
+        <img id="albumArt" src="/images/placeholder.jpg" alt="Album Art" class="album-image">
+      </div>
+
+      <!-- Info Display -->
+      <div class="info-display">
+        <div class="song-title" id="songTitle">Select a song</div>
+        <div class="song-artist" id="songArtist">No song playing</div>
+        <div class="song-duration" id="songDuration">0:00 / 0:00</div>
+      </div>
+
+      <!-- Visualizer -->
+      <canvas id="visualizer" class="visualizer"></canvas>
+
+      <!-- Progress Bar -->
+      <div class="progress-container">
+        <input type="range" id="progress" class="progress-bar" min="0" max="100" value="0">
+      </div>
+
+      <!-- Volume Control -->
+      <div class="volume-container">
+        <label>Volume:</label>
+        <input type="range" id="volume" class="volume-slider" min="0" max="100" value="80">
+      </div>
+
+      <!-- Player Controls -->
+      <div class="controls">
+        <button id="prevBtn" class="control-btn" title="Previous">⏮</button>
+        <button id="playBtn" class="control-btn play-btn" title="Play/Pause">▶</button>
+        <button id="nextBtn" class="control-btn" title="Next">⏭</button>
+        <button id="shuffleBtn" class="control-btn" title="Shuffle">🔀</button>
+        <button id="repeatBtn" class="control-btn" title="Repeat">🔁</button>
+      </div>
+
+      <!-- Playlist Selector -->
+      <div class="playlist-selector">
+        <label for="albumSelect">Album:</label>
+        <select id="albumSelect" class="album-dropdown">
+          <option value="">Select an album...</option>
+        </select>
+      </div>
+
+      <!-- Songs List -->
+      <div class="songs-list">
+        <div id="songsList" class="songs-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden audio element -->
+  <audio id="audioPlayer"></audio>
+
+  <script src="/player.js"></script>
+</body>
+</html>

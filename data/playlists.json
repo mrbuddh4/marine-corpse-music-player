@@ -1,0 +1,200 @@
+[
+  {
+    "id": "die-by-the-horns",
+    "name": "Die By The Horns",
+    "artist": "Marine Corpse",
+    "year": 2025,
+    "albumArt": "/images/Die By The Horns.jpg",
+    "songs": [
+      {
+        "id": "song-1767028710779-0.3875618763912386",
+        "title": "Marine Corpse - Die By The Horns - 01 Kill For Water",
+        "duration": 194,
+        "file": "/music/Die By The Horns/Marine Corpse - Die By The Horns - 01 Kill For Water.mp3"
+      },
+      {
+        "id": "song-1767028710784-0.5381837084333879",
+        "title": "Marine Corpse - Die By The Horns - 02 Cause Of Death",
+        "duration": 38,
+        "file": "/music/Die By The Horns/Marine Corpse - Die By The Horns - 02 Cause Of Death.mp3"
+      },
+      {
+        "id": "song-1767028710788-0.35535653682377144",
+        "title": "Marine Corpse - Die By The Horns - 03 Martial Law",
+        "duration": 69,
+        "file": "/music/Die By The Horns/Marine Corpse - Die By The Horns - 03 Martial Law.mp3"
+      },
+      {
+        "id": "song-1767028710793-0.7026315186541046",
+        "title": "Marine Corpse - Die By The Horns - 04 Dead From Not Eating",
+        "duration": 174,
+        "file": "/music/Die By The Horns/Marine Corpse - Die By The Horns - 04 Dead From Not Eating.mp3"
+      },
+      {
+        "id": "song-1767028710797-0.5956496528143019",
+        "title": "Marine Corpse - Die By The Horns - 05 Veg For Satan",
+        "duration": 95,
+        "file": "/music/Die By The Horns/Marine Corpse - Die By The Horns - 05 Veg For Satan.mp3"
+      },
+      {
+        "id": "song-1767028710801-0.49173275672718453",
+        "title": "Marine Corpse - Die By The Horns - 06 I Don't Have To Work Tomorrow",
+        "duration": 77,
+        "file": "/music/Die By The Horns/Marine Corpse - Die By The Horns - 06 I Don't Have To Work Tomorrow.mp3"
+      },
+      {
+        "id": "song-1767028710805-0.03186284644123749",
+        "title": "Marine Corpse - Die By The Horns - 07 Unshod Hooves To Supple Skulls",
+        "duration": 151,
+        "file": "/music/Die By The Horns/Marine Corpse - Die By The Horns - 07 Unshod Hooves To Supple Skulls.mp3"
+      },
+      {
+        "id": "song-1767028710808-0.12591783234898357",
+        "title": "Marine Corpse - Die By The Horns - 08 Heirs To Anathema",
+        "duration": 108,
+        "file": "/music/Die By The Horns/Marine Corpse - Die By The Horns - 08 Heirs To Anathema.mp3"
+      },
+      {
+        "id": "song-1767028710811-0.580720154914218",
+        "title": "Marine Corpse - Die By The Horns - 09 Kill All Celebrities",
+        "duration": 105,
+        "file": "/music/Die By The Horns/Marine Corpse - Die By The Horns - 09 Kill All Celebrities.mp3"
+      }
+    ]
+  },
+  {
+    "id": "gaia-shrugged",
+    "name": "Gaia Shrugged",
+    "artist": "Marine Corpse",
+    "year": 2025,
+    "albumArt": "/images/Gaia Shrugged.jpg",
+    "songs": [
+      {
+        "id": "song-1767028710815-0.3305100053733162",
+        "title": "Marine Corpse - Gaia Shrugged - 01 Intro",
+        "duration": 39,
+        "file": "/music/Gaia Shrugged/Marine Corpse - Gaia Shrugged - 01 Intro.mp3"
+      },
+      {
+        "id": "song-1767028710818-0.5866575642013323",
+        "title": "Marine Corpse - Gaia Shrugged - 02 Space Shit",
+        "duration": 106,
+        "file": "/music/Gaia Shrugged/Marine Corpse - Gaia Shrugged - 02 Space Shit.mp3"
+      },
+      {
+        "id": "song-1767028710823-0.9685031424102026",
+        "title": "Marine Corpse - Gaia Shrugged - 03 Hurricane Sandy Was An Inside Job",
+        "duration": 112,
+        "file": "/music/Gaia Shrugged/Marine Corpse - Gaia Shrugged - 03 Hurricane Sandy Was An Inside Job.mp3"
+      },
+      {
+        "id": "song-1767028710825-0.0984639492603272",
+        "title": "Marine Corpse - Gaia Shrugged - 04 Glasses In The Pit",
+        "duration": 113,
+        "file": "/music/Gaia Shrugged/Marine Corpse - Gaia Shrugged - 04 Glasses In The Pit.mp3"
+      },
+      {
+        "id": "song-1767028710830-0.6505141595031558",
+        "title": "Marine Corpse - Gaia Shrugged - 05 Auto-da-Fé",
+        "duration": 143,
+        "file": "/music/Gaia Shrugged/Marine Corpse - Gaia Shrugged - 05 Auto-da-Fé.mp3"
+      },
+      {
+        "id": "song-1767028710832-0.9360332862184549",
+        "title": "Marine Corpse - Gaia Shrugged - 06 Landlords",
+        "duration": 112,
+        "file": "/music/Gaia Shrugged/Marine Corpse - Gaia Shrugged - 06 Landlords.mp3"
+      },
+      {
+        "id": "song-1767028710837-0.20761650623449035",
+        "title": "Marine Corpse - Gaia Shrugged - 07 Renaissance Alert",
+        "duration": 136,
+        "file": "/music/Gaia Shrugged/Marine Corpse - Gaia Shrugged - 07 Renaissance Alert.mp3"
+      },
+      {
+        "id": "song-1767028710839-0.39928540427040415",
+        "title": "Marine Corpse - Gaia Shrugged - 08 Clinical War",
+        "duration": 166,
+        "file": "/music/Gaia Shrugged/Marine Corpse - Gaia Shrugged - 08 Clinical War.mp3"
+      },
+      {
+        "id": "song-1767028710844-0.28474165310983424",
+        "title": "Marine Corpse - Gaia Shrugged - 09 Gaia Shrugged",
+        "duration": 126,
+        "file": "/music/Gaia Shrugged/Marine Corpse - Gaia Shrugged - 09 Gaia Shrugged.mp3"
+      },
+      {
+        "id": "song-1767028710847-0.9394296252524408",
+        "title": "Marine Corpse - Gaia Shrugged - 10 Total Wretch",
+        "duration": 148,
+        "file": "/music/Gaia Shrugged/Marine Corpse - Gaia Shrugged - 10 Total Wretch.mp3"
+      }
+    ]
+  },
+  {
+    "id": "non-euclidian-rhythms",
+    "name": "Non-Euclidian Rhythms",
+    "artist": "Marine Corpse",
+    "year": 2025,
+    "albumArt": "/images/Non-Euclidian Rhythms.jpg",
+    "songs": [
+      {
+        "id": "song-1767028710851-0.7007653769098988",
+        "title": "Marine Corpse - Non-Euclidean Rhythms - 01 Millions of Dead Nazis (NSMKYS Remix)",
+        "duration": 187,
+        "file": "/music/Non-Euclidian Rhythms/Marine Corpse - Non-Euclidean Rhythms - 01 Millions of Dead Nazis (NSMKYS Remix).mp3"
+      },
+      {
+        "id": "song-1767028710855-0.7914184972204275",
+        "title": "Marine Corpse - Non-Euclidean Rhythms - 02 Anthropocide (Human Compost Remix)",
+        "duration": 211,
+        "file": "/music/Non-Euclidian Rhythms/Marine Corpse - Non-Euclidean Rhythms - 02 Anthropocide (Human Compost Remix).mp3"
+      },
+      {
+        "id": "song-1767028710859-0.6770815647508952",
+        "title": "Marine Corpse - Non-Euclidean Rhythms - 03 Kill The Boss In Your Head (Downward Mobility Remix)",
+        "duration": 153,
+        "file": "/music/Non-Euclidian Rhythms/Marine Corpse - Non-Euclidean Rhythms - 03 Kill The Boss In Your Head (Downward Mobility Remix).mp3"
+      },
+      {
+        "id": "song-1767028710865-0.7985996807663307",
+        "title": "Marine Corpse - Non-Euclidean Rhythms - 04 Hell Is Real (Slaughtertrap Remix)",
+        "duration": 274,
+        "file": "/music/Non-Euclidian Rhythms/Marine Corpse - Non-Euclidean Rhythms - 04 Hell Is Real (Slaughtertrap Remix).mp3"
+      }
+    ]
+  },
+  {
+    "id": "upside-down-crossroads-of-amerikkka",
+    "name": "Upside Down Crossroads Of AmeriKKKa",
+    "artist": "Marine Corpse",
+    "year": 2025,
+    "albumArt": "/images/Upside Down Crossroads Of AmeriKKKa.jpg",
+    "songs": [
+      {
+        "id": "song-1767028710870-0.9919492736596808",
+        "title": "Marine Corpse - Upside Down Crossroads of AmeriKKKa - 01 NSMKYS",
+        "duration": 187,
+        "file": "/music/Upside Down Crossroads Of AmeriKKKa/Marine Corpse - Upside Down Crossroads of AmeriKKKa - 01 NSMKYS.mp3"
+      },
+      {
+        "id": "song-1767028710872-0.7966663811588389",
+        "title": "Marine Corpse - Upside Down Crossroads of AmeriKKKa - 02 Human Compost",
+        "duration": 211,
+        "file": "/music/Upside Down Crossroads Of AmeriKKKa/Marine Corpse - Upside Down Crossroads of AmeriKKKa - 02 Human Compost.mp3"
+      },
+      {
+        "id": "song-1767028710876-0.1380587915591166",
+        "title": "Marine Corpse - Upside Down Crossroads of AmeriKKKa - 03 Downward Mobility",
+        "duration": 155,
+        "file": "/music/Upside Down Crossroads Of AmeriKKKa/Marine Corpse - Upside Down Crossroads of AmeriKKKa - 03 Downward Mobility.mp3"
+      },
+      {
+        "id": "song-1767028710880-0.8616252188631813",
+        "title": "Marine Corpse - Upside Down Crossroads of AmeriKKKa - 04 Slaughtertrap",
+        "duration": 286,
+        "file": "/music/Upside Down Crossroads Of AmeriKKKa/Marine Corpse - Upside Down Crossroads of AmeriKKKa - 04 Slaughtertrap.mp3"
+      }
+    ]
+  }
+]
