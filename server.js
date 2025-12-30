@@ -15,6 +15,9 @@ app.use(express.json());
 // Serve music files
 app.use('/music', express.static('music'));
 
+// Serve lyrics files
+app.use('/lyrics', express.static('lyrics'));
+
 // Get albums and playlist data
 app.get('/api/playlists', (req, res) => {
   try {

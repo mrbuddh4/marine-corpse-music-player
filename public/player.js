@@ -29,6 +29,7 @@ class WinampPlayer {
     this.songDuration = document.getElementById('songDuration');
     this.albumArt = document.getElementById('albumArt');
     this.visualizerCanvas = document.getElementById('visualizer');
+    this.lyricsDisplay = document.getElementById('lyrics');
     this.analyser = null;
     this.audioContext = null;
   }
@@ -137,6 +138,26 @@ class WinampPlayer {
     this.songTitle.textContent = track.title;
     this.songArtist.textContent = this.currentAlbum?.artist || 'Unknown Artist';
     this.progressBar.max = track.duration;
+    
+    // Fetch lyrics from text file
+    this.loadLyrics(track);
+  }
+
+  async loadLyrics(track) {
+    try {
+      // Use provided lyrics path or construct one
+      const lyricsPath = track.lyricsFile || `/lyrics/${this.currentAlbum.name}/${track.title}.txt`;
+      const response = await fetch(lyricsPath);
+      
+      if (response.ok) {
+        const lyrics = await response.text();
+        this.lyricsDisplay.textContent = lyrics;
+      } else {
+        this.lyricsDisplay.textContent = 'No lyrics available';
+      }
+    } catch (error) {
+      this.lyricsDisplay.textContent = 'No lyrics available';
+    }
   }
 
   togglePlay() {

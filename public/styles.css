@@ -287,6 +287,51 @@ body {
   color: #aaa;
 }
 
+/* Lyrics Display */
+.lyrics-container {
+  margin: 2px;
+  border: 2px solid;
+  border-color: #000000 #dfdfdf #dfdfdf #000000;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  max-height: 300px;
+}
+
+.lyrics-title {
+  background: #c0c0c0;
+  padding: 4px 8px;
+  font-weight: bold;
+  font-size: 11px;
+  border-bottom: 1px solid #dfdfdf;
+}
+
+.lyrics-display {
+  flex: 1;
+  padding: 8px;
+  overflow-y: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  color: #000;
+  line-height: 1.6;
+}
+
+/* Scrollbar styling */
+.lyrics-display::-webkit-scrollbar {
+  width: 12px;
+}
+
+.lyrics-display::-webkit-scrollbar-track {
+  background: #c0c0c0;
+}
+
+.lyrics-display::-webkit-scrollbar-thumb {
+  background: #dfdfdf;
+  border: 1px solid #808080;
+}
+
 /* Scrollbar styling */
 .songs-list::-webkit-scrollbar {
   width: 12px;
