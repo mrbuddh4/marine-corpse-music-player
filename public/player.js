@@ -56,6 +56,11 @@ class WinampPlayer {
       if (playlists.length > 0) {
         this.albumSelect.value = playlists[0].id;
         this.selectAlbum(playlists[0].id);
+        
+        // Auto-play after a short delay to ensure audio is ready
+        setTimeout(() => {
+          this.play();
+        }, 500);
       }
     } catch (error) {
       console.error('Failed to load playlists:', error);
