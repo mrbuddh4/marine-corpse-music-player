@@ -78,6 +78,27 @@
   <!-- Hidden audio element -->
   <audio id="audioPlayer"></audio>
 
+  <!-- Prank Popup Modal -->
+  <div id="prankModal" class="prank-modal">
+    <div class="prank-window">
+      <div class="prank-title-bar">
+        <span>Warning</span>
+        <button class="prank-close-btn" id="prankCloseBtn">×</button>
+      </div>
+      <div class="prank-content">
+        <p>Yes means no and no means yes. Do you want me to delete your hard drive?</p>
+      </div>
+      <div class="prank-progress" id="prankProgress" style="display: none;">
+        <div class="prank-progress-bar">
+          <div class="prank-progress-fill" id="prankProgressFill"></div>
+        </div>
+      </div>
+      <div class="prank-buttons">
+        <button id="prankOkBtn" class="prank-btn">Ok</button>
+      </div>
+    </div>
+  </div>
+
   <script src="/player.js"></script>
 </body>
 </html>

@@ -318,4 +318,38 @@ class WinampPlayer {
 // Initialize player when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   new WinampPlayer();
+  initPrankModal();
 });
+
+// Prank Modal
+function initPrankModal() {
+  const modal = document.getElementById('prankModal');
+  const okBtn = document.getElementById('prankOkBtn');
+  const closeBtn = document.getElementById('prankCloseBtn');
+  const prankProgress = document.getElementById('prankProgress');
+  const prankProgressFill = document.getElementById('prankProgressFill');
+
+  okBtn.addEventListener('click', () => {
+    okBtn.disabled = true;
+    prankProgress.style.display = 'block';
+    
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += Math.random() * 30 + 15;
+      if (progress > 100) progress = 100;
+      
+      prankProgressFill.style.width = progress + '%';
+      
+      if (progress >= 100) {
+        clearInterval(interval);
+        setTimeout(() => {
+          modal.style.display = 'none';
+        }, 500);
+      }
+    }, 150);
+  });
+
+  closeBtn.addEventListener('click', () => {
+    modal.style.display = 'none';
+  });
+}
