@@ -340,7 +340,7 @@ function initPrankModal() {
     
     let progress = 0;
     const interval = setInterval(() => {
-      progress += Math.random() * 30 + 15;
+      progress += Math.random() * 10 + 5;
       if (progress > 100) progress = 100;
       
       prankProgressFill.style.width = progress + '%';
@@ -351,7 +351,7 @@ function initPrankModal() {
           modal.style.display = 'none';
         }, 500);
       }
-    }, 150);
+    }, 300);
   });
 
   closeBtn.addEventListener('click', () => {
