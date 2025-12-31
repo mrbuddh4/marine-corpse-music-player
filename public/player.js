@@ -132,11 +132,14 @@ class WinampPlayer {
 
   startAutoplay() {
     // Play immediately - audio src is already loaded from selectAlbum
-    this.audio.muted = true; // Ensure muted for autoplay policy
-    this.audio.play().then(() => {
-      this.audio.muted = false; // Unmute once playing
-      this.incrementPlayCount();
-    }).catch(err => console.log('Autoplay error:', err.message));
+    // Add small delay to ensure fetchPlayCount has completed
+    setTimeout(() => {
+      this.audio.muted = true; // Ensure muted for autoplay policy
+      this.audio.play().then(() => {
+        this.audio.muted = false; // Unmute once playing
+        this.incrementPlayCount();
+      }).catch(err => console.log('Autoplay error:', err.message));
+    }, 100);
   }
 
   updateSongsList() {
