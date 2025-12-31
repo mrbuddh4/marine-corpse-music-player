@@ -43,9 +43,12 @@ class WinampPlayer {
 
   async fetchPlayCount() {
     try {
+      console.log('Fetching initial play count...');
       const response = await fetch('/api/play-count');
       const data = await response.json();
+      console.log('Fetched play count:', data.count);
       this.playCount = data.count || 0;
+      console.log('Set playCount to:', this.playCount);
       this.updatePlayCountDisplay();
     } catch (error) {
       console.error('Failed to fetch play count:', error);
