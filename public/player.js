@@ -84,10 +84,12 @@ class WinampPlayer {
         
         // Autoplay when audio is ready - play while muted, then unmute
         const autoplayOnce = () => {
+          console.log('Canplay event: attempting autoplay');
           this.audio.muted = true; // Ensure muted
           this.audio.play().then(() => {
+            console.log('Play succeeded, unmuting');
             this.audio.muted = false; // Unmute after play starts
-            this.incrementPlayCount().catch(err => console.log('Count error:', err));
+            this.incrementPlayCount();
           }).catch(err => console.log('Autoplay error:', err.message));
           this.audio.removeEventListener('canplay', autoplayOnce);
         };
@@ -96,11 +98,13 @@ class WinampPlayer {
         // Fallback: also try after 2 seconds in case canplay doesn't fire
         setTimeout(() => {
           if (!this.isPlaying) {
+            console.log('Fallback: attempting autoplay');
             this.audio.muted = true;
             this.audio.play().then(() => {
+              console.log('Fallback play succeeded, unmuting');
               this.audio.muted = false;
-              this.incrementPlayCount().catch(err => console.log('Count error:', err));
-            }).catch(err => console.log('Autoplay error:', err.message));
+              this.incrementPlayCount();
+            }).catch(err => console.log('Fallback autoplay error:', err.message));
           }
         }, 2000);
       }
