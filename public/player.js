@@ -12,7 +12,13 @@ class WinampPlayer {
     this.audioContext = null;
     this.analyser = null;
     this.audioContextInitialized = false;
-    this.playCountedForCurrentTrack = false; // Track if we've counted this track's play
+    this.playCountedForCurrentTrack = false;
+    
+    // Visualizer properties
+    this.visualizerCanvas = null;
+    this.visualizerCtx = null;
+    this.audioData = null; // Pre-computed frequency data
+    this.animationFrameId = null;
     
     this.initElements();
     this.setupEventListeners();
@@ -36,6 +42,10 @@ class WinampPlayer {
     this.albumArt = document.getElementById('albumArt');
     this.lyricsDisplay = document.getElementById('lyrics');
     this.playCountDisplay = document.getElementById('playCount');
+    
+    // Visualizer setup
+    this.visualizerCanvas = document.getElementById('visualizer');
+    this.visualizerCtx = this.visualizerCanvas.getContext('2d');
     
     // Set initial volume to 80%
     this.audio.volume = 0.8;
@@ -119,6 +129,7 @@ class WinampPlayer {
     this.audio.addEventListener('pause', () => {
       this.isPlaying = false;
       this.playBtn.textContent = '▶';
+      if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
     });
   }
 
@@ -187,8 +198,11 @@ class WinampPlayer {
     this.songTitle.textContent = track.title;
     this.songArtist.textContent = this.currentAlbum?.artist || 'Unknown Artist';
     this.progressBar.max = track.duration;
-    this.progressBar.value = 0; // Reset progress bar to start
-    this.playCountedForCurrentTrack = false; // Reset play count flag for new track
+    this.progressBar.value = 0;
+    this.playCountedForCurrentTrack = false;
+    
+    // Load audio data for visualizer
+    this.loadAudioData(track);
     
     // Fetch lyrics from text file
     this.loadLyrics(track);
@@ -342,6 +356,103 @@ class WinampPlayer {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  async loadAudioData(track) {
+    try {
+      const response = await fetch(track.file);
+      const arrayBuffer = await response.arrayBuffer();
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+      this.analyzeAudioBuffer(audioBuffer);
+    } catch (err) {
+      console.log('Error loading audio data for visualization:', err);
+    }
+  }
+
+  analyzeAudioBuffer(audioBuffer) {
+    const offlineContext = new OfflineAudioContext(audioBuffer.numberOfChannels, audioBuffer.length, audioBuffer.sampleRate);
+    const source = offlineContext.createBufferSource();
+    source.buffer = audioBuffer;
+    const analyser = offlineContext.createAnalyser();
+    analyser.fftSize = 256;
+    source.connect(analyser);
+    analyser.connect(offlineContext.destination);
+    source.start(0);
+
+    // Sample the frequency data at regular intervals
+    const frequencyBands = [];
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+    const totalDuration = audioBuffer.duration;
+    const sampleInterval = 0.1; // Sample every 100ms
+    
+    for (let time = 0; time < totalDuration; time += sampleInterval) {
+      offlineContext.suspend(time).then(() => {
+        analyser.getByteFrequencyData(dataArray);
+        const bands = Array.from(dataArray.slice(0, 8)).map(v => v / 255); // 8 bars
+        frequencyBands.push({ time, bands });
+        offlineContext.resume();
+      });
+    }
+    
+    this.audioData = frequencyBands;
+    this.startVisualizerAnimation();
+  }
+
+  startVisualizerAnimation() {
+    if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
+    
+    const animate = () => {
+      const currentTime = this.audio.currentTime;
+      const data = this.audioData;
+      
+      if (data && data.length > 0) {
+        // Find the closest frequency data point
+        let closestData = data[0];
+        let minDiff = Math.abs(data[0].time - currentTime);
+        
+        for (let d of data) {
+          const diff = Math.abs(d.time - currentTime);
+          if (diff < minDiff) {
+            minDiff = diff;
+            closestData = d;
+          }
+        }
+        
+        this.drawVisualizer(closestData.bands);
+      }
+      
+      if (this.isPlaying) {
+        this.animationFrameId = requestAnimationFrame(animate);
+      }
+    };
+    
+    animate();
+  }
+
+  drawVisualizer(bands) {
+    const ctx = this.visualizerCtx;
+    const width = this.visualizerCanvas.width;
+    const height = this.visualizerCanvas.height;
+    
+    // Clear canvas
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, width, height);
+    
+    // Draw bars
+    const barWidth = width / bands.length;
+    const gradient = ctx.createLinearGradient(0, 0, 0, height);
+    gradient.addColorStop(0, '#00ff00');
+    gradient.addColorStop(0.5, '#ffff00');
+    gradient.addColorStop(1, '#ff0000');
+    
+    ctx.fillStyle = gradient;
+    for (let i = 0; i < bands.length; i++) {
+      const barHeight = bands[i] * height;
+      const x = i * barWidth;
+      const y = height - barHeight;
+      ctx.fillRect(x + 2, y, barWidth - 4, barHeight);
+    }
   }
 }
 
