@@ -311,6 +311,9 @@ class WinampPlayer {
     // Set canvas resolution
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
+    
+    const barCount = 10;
+    let lastBarHeights = new Array(barCount).fill(0);
 
     const draw = () => {
       requestAnimationFrame(draw);
@@ -318,7 +321,6 @@ class WinampPlayer {
       ctx.fillStyle = '#000';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      const barCount = 10;
       const barWidth = canvas.width / barCount;
       
       // Check if audio is actually playing
@@ -338,15 +340,21 @@ class WinampPlayer {
       for (let i = 0; i < barCount; i++) {
         let barHeight = 0;
         
-        if (frequencyData) {
-          // Use actual frequency data
-          const dataIndex = Math.floor((i / barCount) * frequencyData.length);
-          barHeight = (frequencyData[dataIndex] / 255) * canvas.height * 0.95;
+        if (isAudioPlaying) {
+          if (frequencyData) {
+            // Use actual frequency data
+            const dataIndex = Math.floor((i / barCount) * frequencyData.length);
+            barHeight = (frequencyData[dataIndex] / 255) * canvas.height * 0.95;
+          }
+          // Minimum height when playing so bars are always visible
+          barHeight = Math.max(barHeight, 5);
         }
-        // If no frequency data or not playing, barHeight stays at 0
+        
+        // Smooth the transition between heights
+        lastBarHeights[i] = lastBarHeights[i] * 0.7 + barHeight * 0.3;
         
         ctx.fillStyle = '#00ff00';
-        ctx.fillRect(i * barWidth + 2, canvas.height - barHeight, barWidth - 4, barHeight);
+        ctx.fillRect(i * barWidth + 2, canvas.height - lastBarHeights[i], barWidth - 4, lastBarHeights[i]);
       }
     };
 
