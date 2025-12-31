@@ -86,8 +86,8 @@ class WinampPlayer {
         const autoplayOnce = () => {
           this.audio.muted = true; // Ensure muted
           this.audio.play().then(() => {
-            this.incrementPlayCount(); // Count the autoplay
             this.audio.muted = false; // Unmute after play starts
+            this.incrementPlayCount().catch(err => console.log('Count error:', err));
           }).catch(err => console.log('Autoplay error:', err.message));
           this.audio.removeEventListener('canplay', autoplayOnce);
         };
@@ -98,8 +98,8 @@ class WinampPlayer {
           if (!this.isPlaying) {
             this.audio.muted = true;
             this.audio.play().then(() => {
-              this.incrementPlayCount(); // Count the fallback autoplay
               this.audio.muted = false;
+              this.incrementPlayCount().catch(err => console.log('Count error:', err));
             }).catch(err => console.log('Autoplay error:', err.message));
           }
         }, 2000);
