@@ -315,6 +315,7 @@ class WinampPlayer {
     const barCount = 10;
     let animationPhase = 0;
     let lastBarHeights = new Array(barCount).fill(0);
+    let debugCounter = 0;
 
     const draw = () => {
       requestAnimationFrame(draw);
@@ -329,16 +330,21 @@ class WinampPlayer {
       const isAudioPlaying = this.audio && !this.audio.paused && this.audio.currentTime > 0;
       const audioVolume = this.audio ? this.audio.volume : 0;
       
-      // Try to get frequency data
-      let frequencyData = null;
-      let hasFrequencyData = false;
+      // Try to get time-domain data instead of frequency
+      let audioData = null;
+      let hasAudioData = false;
       if (isAudioPlaying && this.analyser) {
         try {
-          frequencyData = new Uint8Array(this.analyser.frequencyBinCount);
-          this.analyser.getByteFrequencyData(frequencyData);
-          // Check if we actually have data
-          const sum = frequencyData.reduce((a, b) => a + b, 0);
-          hasFrequencyData = sum > 50;
+          audioData = new Uint8Array(this.analyser.frequencyBinCount);
+          this.analyser.getByteTimeDomainData(audioData);
+          // Check if we actually have data (should not all be 128)
+          const sum = audioData.reduce((a, b) => a + Math.abs(b - 128), 0);
+          hasAudioData = sum > 100;
+          
+          debugCounter++;
+          if (debugCounter % 60 === 0) {
+            console.log('Audio data sum:', sum, 'Has data:', hasAudioData);
+          }
         } catch (e) {
           // Silent fail
         }
@@ -348,17 +354,17 @@ class WinampPlayer {
         let barHeight = 0;
         
         if (isAudioPlaying) {
-          if (hasFrequencyData && frequencyData) {
-            // Use actual frequency data
-            const dataIndex = Math.floor((i / barCount) * frequencyData.length);
-            barHeight = (frequencyData[dataIndex] / 255) * canvas.height * 0.95;
+          if (hasAudioData && audioData) {
+            // Use actual audio data
+            const dataIndex = Math.floor((i / barCount) * audioData.length);
+            barHeight = Math.abs((audioData[dataIndex] - 128) / 128) * canvas.height * 0.9;
           } else {
             // Fallback: pulse based on audio volume and time
             const pulsePhase = animationPhase + (i / barCount) * Math.PI * 2;
             const basePulse = Math.sin(pulsePhase) * 0.5 + 0.5;
             barHeight = (basePulse + audioVolume * 0.5) * canvas.height * 0.8;
           }
-          // Minimum height when playing so bars are always visible
+          // Minimum height when playing
           barHeight = Math.max(barHeight, 6);
         }
         
