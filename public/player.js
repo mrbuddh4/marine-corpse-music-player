@@ -35,6 +35,10 @@ class WinampPlayer {
     this.albumArt = document.getElementById('albumArt');
     this.lyricsDisplay = document.getElementById('lyrics');
     this.playCountDisplay = document.getElementById('playCount');
+    
+    // Set initial volume to 80%
+    this.audio.volume = 0.8;
+    this.volumeSlider.value = 80;
   }
 
   async fetchPlayCount() {
