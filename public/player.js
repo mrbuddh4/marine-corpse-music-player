@@ -35,8 +35,6 @@ class WinampPlayer {
     this.visualizerCanvas = document.getElementById('visualizer');
     this.lyricsDisplay = document.getElementById('lyrics');
     this.playCountDisplay = document.getElementById('playCount');
-    this.analyser = null;
-    this.audioContext = null;
   }
 
   async loadPlaylists() {
@@ -188,28 +186,36 @@ class WinampPlayer {
   }
 
   play() {
-    // Initialize audio context if needed
+    // Initialize audio context only once
     if (!this.audioContext) {
       try {
         this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
         this.analyser = this.audioContext.createAnalyser();
         this.analyser.fftSize = 256;
+        this.analyser.smoothingTimeConstant = 0.8;
         
+        // Create source from audio element and connect to analyser
         const source = this.audioContext.createMediaElementAudioSource(this.audio);
         source.connect(this.analyser);
         this.analyser.connect(this.audioContext.destination);
-        console.log('Audio context initialized on play');
+        console.log('Audio context and analyser initialized');
       } catch (e) {
-        console.error('Audio context error:', e);
+        console.error('Audio context init error:', e);
       }
     }
     
-    // Resume audio context if suspended
-    if (this.audioContext && this.audioContext.state === 'suspended') {
-      this.audioContext.resume();
+    // Resume audio context if it's suspended
+    if (this.audioContext) {
+      if (this.audioContext.state === 'suspended') {
+        this.audioContext.resume().then(() => {
+          console.log('Audio context resumed');
+        });
+      }
     }
     
-    this.audio.play().catch(() => {});
+    this.audio.play().catch(err => {
+      console.error('Play error:', err);
+    });
     this.playCount++;
     localStorage.setItem('playCount', this.playCount);
     this.updatePlayCountDisplay();
