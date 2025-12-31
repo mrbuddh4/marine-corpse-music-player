@@ -183,41 +183,7 @@ class WinampPlayer {
   }
 
   play() {
-    // Initialize audio context on first play (after user interaction)
-    if (!this.audioContextInitialized) {
-      try {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        this.audioContext = new AudioContextClass();
-        console.log('AudioContext type:', this.audioContext.constructor.name);
-        console.log('Has createMediaElementAudioSource:', typeof this.audioContext.createMediaElementAudioSource);
-        
-        this.analyser = this.audioContext.createAnalyser();
-        this.analyser.fftSize = 256;
-        this.analyser.smoothingTimeConstant = 0.8;
-        
-        const source = this.audioContext.createMediaElementAudioSource(this.audio);
-        source.connect(this.analyser);
-        this.analyser.connect(this.audioContext.destination);
-        this.audioContextInitialized = true;
-        console.log('Audio context and source initialized on first play');
-      } catch (e) {
-        console.error('Audio context init error:', e);
-        console.error('AudioContext:', this.audioContext);
-      }
-    }
-    
-    // Resume audio context if it's suspended
-    if (this.audioContext && this.audioContext.state === 'suspended') {
-      this.audioContext.resume().then(() => {
-        console.log('Audio context resumed');
-        // Unmute after context resumes
-        this.audio.muted = false;
-      });
-    } else if (this.audioContext) {
-      // If not suspended, just unmute
-      this.audio.muted = false;
-    }
-    
+    this.audio.muted = false;
     this.audio.play().catch(err => {
       console.error('Play error:', err);
     });
@@ -320,11 +286,10 @@ class WinampPlayer {
     canvas.height = canvas.offsetHeight;
     
     let animationPhase = 0;
-    let debugCounter = 0;
 
     const draw = () => {
       requestAnimationFrame(draw);
-      animationPhase += 0.02;
+      animationPhase += 0.05;
 
       ctx.fillStyle = '#000';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -332,56 +297,24 @@ class WinampPlayer {
       const barCount = 10;
       const barWidth = canvas.width / barCount;
       
-      let dataArray = null;
-      let hasAudio = false;
-      
-      // Try to get time-domain data from analyser
-      if (this.analyser && this.audio.currentTime > 0 && !this.audio.paused) {
-        try {
-          dataArray = new Uint8Array(this.analyser.frequencyBinCount);
-          this.analyser.getByteTimeDomainData(dataArray);
-          
-          // Check if we have actual audio data
-          const sum = dataArray.reduce((a, b) => a + Math.abs(b - 128), 0);
-          if (sum > 100) {
-            hasAudio = true;
-          }
-          
-          // Debug logging every 30 frames
-          debugCounter++;
-          if (debugCounter % 30 === 0) {
-            console.log('Analyser:', this.analyser ? 'exists' : 'null', 'FFT:', this.analyser?.fftSize, 'Sum:', sum, 'DataLen:', dataArray.length);
-          }
-        } catch (e) {
-          console.error('Analyser error:', e);
-        }
-      }
+      // Check if audio is actually playing
+      const isAudioPlaying = this.audio && !this.audio.paused && this.audio.currentTime > 0;
       
       for (let i = 0; i < barCount; i++) {
         let barHeight;
         
-        if (hasAudio && dataArray) {
-          // Use waveform data - sample across the entire array for each bar
-          const startIdx = Math.floor((i / barCount) * dataArray.length);
-          const endIdx = Math.floor(((i + 1) / barCount) * dataArray.length);
-          let sum = 0;
-          let count = 0;
-          
-          for (let j = startIdx; j < endIdx; j++) {
-            sum += Math.abs(dataArray[j] - 128);
-            count++;
-          }
-          
-          const avg = count > 0 ? sum / count : 0;
-          barHeight = (avg / 128) * canvas.height * 0.9;
+        if (isAudioPlaying) {
+          // When playing, show animated bars with slight variations
+          const pulsePhase = animationPhase + (i / barCount) * Math.PI * 2;
+          const basePulse = Math.sin(pulsePhase) * 0.5 + 0.5;
+          const variance = Math.sin(pulsePhase * 1.5 + i * 0.3) * 0.25;
+          barHeight = (basePulse + variance) * canvas.height * 0.85;
+          barHeight = Math.max(barHeight, 8); // Minimum height when playing
         } else {
-          // Use idle animation when no audio
+          // Idle wave when not playing
           const wave = Math.sin(animationPhase + i * 0.5) * 0.5 + 0.5;
-          barHeight = wave * canvas.height * 0.6;
+          barHeight = wave * canvas.height * 0.5;
         }
-        
-        // Ensure minimum visible height
-        if (barHeight < 2) barHeight = 2;
         
         ctx.fillStyle = '#00ff00';
         ctx.fillRect(i * barWidth + 2, canvas.height - barHeight, barWidth - 4, barHeight);
