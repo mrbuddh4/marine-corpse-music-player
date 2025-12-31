@@ -81,11 +81,23 @@ class WinampPlayer {
         this.albumSelect.value = playlists[0].id;
         this.selectAlbum(playlists[0].id);
         
-        // Auto-play after a short delay to ensure audio is ready
-        setTimeout(() => {
+        // Auto-play when audio is ready
+        const autoplayOnce = () => {
+          console.log('Audio ready, starting autoplay');
           this.audio.muted = false;
           this.audio.play().catch(err => console.log('Autoplay error:', err));
-        }, 1000);
+          this.audio.removeEventListener('canplay', autoplayOnce);
+        };
+        this.audio.addEventListener('canplay', autoplayOnce);
+        
+        // Fallback: also try after 2 seconds in case canplay doesn't fire
+        setTimeout(() => {
+          if (!this.isPlaying) {
+            console.log('Fallback autoplay after timeout');
+            this.audio.muted = false;
+            this.audio.play().catch(err => console.log('Autoplay error:', err));
+          }
+        }, 2000);
       }
     } catch (error) {
       console.error('Failed to load playlists:', error);
