@@ -54,9 +54,12 @@ class WinampPlayer {
 
   async incrementPlayCount() {
     try {
+      console.log('Incrementing play count, current:', this.playCount);
       const response = await fetch('/api/play-count', { method: 'POST' });
       const data = await response.json();
+      console.log('Response:', data);
       this.playCount = data.count || 0;
+      console.log('Updated play count to:', this.playCount);
       this.updatePlayCountDisplay();
     } catch (error) {
       console.error('Failed to increment play count:', error);
