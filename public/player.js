@@ -289,13 +289,18 @@ class WinampPlayer {
 
     const initAudio = () => {
       if (!this.audioContext) {
-        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        this.analyser = this.audioContext.createAnalyser();
-        this.analyser.fftSize = 256;
-        
-        const source = this.audioContext.createMediaElementAudioSource(this.audio);
-        source.connect(this.analyser);
-        this.analyser.connect(this.audioContext.destination);
+        try {
+          this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          this.analyser = this.audioContext.createAnalyser();
+          this.analyser.fftSize = 256;
+          
+          const source = this.audioContext.createMediaElementAudioSource(this.audio);
+          source.connect(this.analyser);
+          this.analyser.connect(this.audioContext.destination);
+          console.log('Audio context initialized');
+        } catch (e) {
+          console.error('Audio context error:', e);
+        }
       }
     };
 
@@ -312,27 +317,27 @@ class WinampPlayer {
       const barCount = 10;
       const barWidth = canvas.width / barCount;
       
+      let dataArray = null;
       if (this.analyser) {
-        // Draw actual audio data
-        const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+        dataArray = new Uint8Array(this.analyser.frequencyBinCount);
         this.analyser.getByteFrequencyData(dataArray);
+      }
+      
+      for (let i = 0; i < barCount; i++) {
+        let barHeight;
         
-        for (let i = 0; i < barCount; i++) {
+        if (dataArray && dataArray.length > 0) {
+          // Use audio data
           const dataIndex = Math.floor((i / barCount) * dataArray.length);
-          const barHeight = (dataArray[dataIndex] / 255) * canvas.height;
-          
-          ctx.fillStyle = '#00ff00';
-          ctx.fillRect(i * barWidth + 2, canvas.height - barHeight, barWidth - 4, barHeight);
-        }
-      } else {
-        // Draw idle animation when no audio context
-        for (let i = 0; i < barCount; i++) {
+          barHeight = (dataArray[dataIndex] / 255) * canvas.height;
+        } else {
+          // Use idle animation
           const wave = Math.sin(animationPhase + i * 0.5) * 0.5 + 0.5;
-          const barHeight = wave * canvas.height * 0.6;
-          
-          ctx.fillStyle = '#00ff00';
-          ctx.fillRect(i * barWidth + 2, canvas.height - barHeight, barWidth - 4, barHeight);
+          barHeight = wave * canvas.height * 0.6;
         }
+        
+        ctx.fillStyle = '#00ff00';
+        ctx.fillRect(i * barWidth + 2, canvas.height - barHeight, barWidth - 4, barHeight);
       }
     };
 
