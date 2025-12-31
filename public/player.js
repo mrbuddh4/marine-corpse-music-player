@@ -110,14 +110,10 @@ class WinampPlayer {
       this.isPlaying = true;
       this.playBtn.textContent = '⏸';
       
-      // Only count as a play if starting from the beginning (within 1 second) and not already counted
-      console.log('Play event: currentTime=', this.audio.currentTime, 'flag=', this.playCountedForCurrentTrack);
+      // Only count as a play if starting from the beginning and not already counted
       if (this.audio.currentTime < 1 && !this.playCountedForCurrentTrack) {
-        console.log('Incrementing play count');
         this.playCountedForCurrentTrack = true;
         this.incrementPlayCount();
-      } else {
-        console.log('Skipping increment');
       }
     });
     this.audio.addEventListener('pause', () => {
@@ -224,29 +220,24 @@ class WinampPlayer {
       }
     }
     
-    // Always unmute on user interaction
     this.audio.muted = false;
     
     if (this.isPlaying) {
       this.audio.pause();
     } else {
       this.audio.play();
-      // incrementPlayCount is now handled in the play event listener
     }
   }
 
   play(allowUnmute = true) {
-    // Initialize audio context on first play (after user interaction)
     if (!this.audioContextInitialized) {
       try {
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         this.audioContext = new AudioContextClass();
-        
         this.analyser = this.audioContext.createAnalyser();
         this.analyser.fftSize = 256;
         this.analyser.smoothingTimeConstant = 0.85;
         
-        // Try to connect the analyser
         if (typeof this.audioContext.createMediaElementAudioSource === 'function') {
           const source = this.audioContext.createMediaElementAudioSource(this.audio);
           source.connect(this.analyser);
@@ -258,7 +249,6 @@ class WinampPlayer {
       }
     }
     
-    // Resume audio context if it's suspended
     if (this.audioContext && this.audioContext.state === 'suspended') {
       this.audioContext.resume();
     }
@@ -266,7 +256,6 @@ class WinampPlayer {
     this.audio.play().catch(err => {
       console.log('Play error:', err);
     });
-    // incrementPlayCount is now handled in the play event listener
   }
 
   updatePlayCountDisplay() {
