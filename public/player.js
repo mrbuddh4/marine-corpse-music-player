@@ -60,11 +60,7 @@ class WinampPlayer {
       if (playlists.length > 0) {
         this.albumSelect.value = playlists[0].id;
         this.selectAlbum(playlists[0].id);
-        
-        // Auto-play after a short delay to ensure audio is ready
-        setTimeout(() => {
-          this.play();
-        }, 500);
+        // Remove autoplay - user must click play button
       }
     } catch (error) {
       console.error('Failed to load playlists:', error);
@@ -206,13 +202,12 @@ class WinampPlayer {
     }
     
     // Resume audio context if it's suspended
-    if (this.audioContext) {
-      console.log('Audio context state:', this.audioContext.state);
-      if (this.audioContext.state === 'suspended') {
-        this.audioContext.resume().then(() => {
-          console.log('Audio context resumed');
-        });
-      }
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      this.audioContext.resume().then(() => {
+        console.log('Audio context resumed');
+        // Unmute after context resumes
+        this.audio.muted = false;
+      });
     }
     
     this.audio.play().catch(err => {
