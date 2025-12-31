@@ -312,17 +312,17 @@ class WinampPlayer {
       ctx.fillStyle = '#000';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      const barWidth = canvas.width / dataArray.length;
-      let x = 0;
-
-      for (let i = 0; i < dataArray.length; i++) {
-        const barHeight = (dataArray[i] / 255) * canvas.height;
+      // Simple visualizer with just 10 bars
+      const barCount = 10;
+      const barWidth = canvas.width / barCount;
+      
+      for (let i = 0; i < barCount; i++) {
+        const dataIndex = Math.floor((i / barCount) * dataArray.length);
+        const barHeight = (dataArray[dataIndex] / 255) * canvas.height;
         
-        // Green gradient like classic Winamp
-        ctx.fillStyle = `hsl(120, 100%, ${50 + (barHeight / canvas.height) * 30}%)`;
-        ctx.fillRect(x, canvas.height - barHeight, barWidth - 1, barHeight);
-        
-        x += barWidth;
+        // Green color
+        ctx.fillStyle = '#00ff00';
+        ctx.fillRect(i * barWidth + 2, canvas.height - barHeight, barWidth - 4, barHeight);
       }
     };
 
