@@ -12,6 +12,7 @@ class WinampPlayer {
     this.audioContext = null;
     this.analyser = null;
     this.audioContextInitialized = false;
+    this.playCountedForCurrentTrack = false; // Track if we've counted this track's play
     
     this.initElements();
     this.setupEventListeners();
@@ -109,8 +110,9 @@ class WinampPlayer {
       this.isPlaying = true;
       this.playBtn.textContent = '⏸';
       
-      // Only count as a play if starting from the beginning (within 1 second)
-      if (this.audio.currentTime < 1) {
+      // Only count as a play if starting from the beginning (within 1 second) and not already counted
+      if (this.audio.currentTime < 1 && !this.playCountedForCurrentTrack) {
+        this.playCountedForCurrentTrack = true;
         this.incrementPlayCount();
       }
     });
@@ -185,6 +187,7 @@ class WinampPlayer {
     this.songArtist.textContent = this.currentAlbum?.artist || 'Unknown Artist';
     this.progressBar.max = track.duration;
     this.progressBar.value = 0; // Reset progress bar to start
+    this.playCountedForCurrentTrack = false; // Reset play count flag for new track
     
     // Fetch lyrics from text file
     this.loadLyrics(track);
