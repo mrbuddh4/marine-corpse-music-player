@@ -203,8 +203,13 @@ class WinampPlayer {
 
   play() {
     // Resume audio context if it's suspended
-    if (this.audioContext && this.audioContext.state === 'suspended') {
-      this.audioContext.resume();
+    if (this.audioContext) {
+      console.log('Audio context state:', this.audioContext.state);
+      if (this.audioContext.state === 'suspended') {
+        this.audioContext.resume().then(() => {
+          console.log('Audio context resumed');
+        });
+      }
     }
     
     this.audio.play().catch(err => {
