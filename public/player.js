@@ -87,7 +87,8 @@ class WinampPlayer {
         
         // Auto-play when audio is ready - play while muted, then unmute
         const autoplayOnce = () => {
-          console.log('Audio ready, starting autoplay');
+          console.log('Audio ready, starting autoplay, src:', this.audio.src);
+          this.audio.muted = true; // Explicitly ensure muted
           this.audio.play().then(() => {
             console.log('Audio playing, unmuting');
             this.audio.muted = false;
@@ -100,6 +101,7 @@ class WinampPlayer {
         setTimeout(() => {
           if (!this.isPlaying) {
             console.log('Fallback autoplay after timeout, src is:', this.audio.src);
+            this.audio.muted = true; // Explicitly ensure muted
             this.audio.play().then(() => {
               console.log('Fallback: audio playing, unmuting');
               this.audio.muted = false;
@@ -185,6 +187,7 @@ class WinampPlayer {
     if (this.currentPlaylist.length === 0) return;
     
     const track = this.currentPlaylist[index];
+    console.log('Loading track:', track.title, 'file:', track.file);
     this.audio.src = track.file;
     this.songTitle.textContent = track.title;
     this.songArtist.textContent = this.currentAlbum?.artist || 'Unknown Artist';
