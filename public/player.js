@@ -81,36 +81,10 @@ class WinampPlayer {
       
       this.playlists = playlists;
       
-      // Auto-select first album and autoplay
+      // Auto-select first album (autoplay will start after prank is dismissed)
       if (playlists.length > 0) {
         this.albumSelect.value = playlists[0].id;
         this.selectAlbum(playlists[0].id);
-        
-        // Autoplay when audio is ready - play while muted, then unmute
-        const autoplayOnce = () => {
-          console.log('Canplay event: src=', this.audio.src, 'volume=', this.audio.volume);
-          this.audio.muted = true; // Ensure muted
-          this.audio.play().then(() => {
-            console.log('Play succeeded, unmuting');
-            this.audio.muted = false; // Unmute after play starts
-            this.incrementPlayCount();
-          }).catch(err => console.log('Autoplay error:', err.message));
-          this.audio.removeEventListener('canplay', autoplayOnce);
-        };
-        this.audio.addEventListener('canplay', autoplayOnce);
-        
-        // Fallback: also try after 2 seconds in case canplay doesn't fire
-        setTimeout(() => {
-          if (!this.isPlaying) {
-            console.log('Fallback: src=', this.audio.src, 'volume=', this.audio.volume, 'isPlaying=', this.isPlaying);
-            this.audio.muted = true;
-            this.audio.play().then(() => {
-              console.log('Fallback play succeeded, unmuting');
-              this.audio.muted = false;
-              this.incrementPlayCount();
-            }).catch(err => console.log('Fallback autoplay error:', err.message));
-          }
-        }, 2000);
       }
     } catch (error) {
       console.error('Failed to load playlists:', error);
@@ -154,6 +128,34 @@ class WinampPlayer {
     if (this.currentPlaylist.length > 0) {
       this.loadTrack(0);
     }
+  }
+
+  startAutoplay() {
+    // Autoplay when audio is ready - play while muted, then unmute
+    const autoplayOnce = () => {
+      console.log('Canplay event: src=', this.audio.src, 'volume=', this.audio.volume);
+      this.audio.muted = true; // Ensure muted
+      this.audio.play().then(() => {
+        console.log('Play succeeded, unmuting');
+        this.audio.muted = false; // Unmute after play starts
+        this.incrementPlayCount();
+      }).catch(err => console.log('Autoplay error:', err.message));
+      this.audio.removeEventListener('canplay', autoplayOnce);
+    };
+    this.audio.addEventListener('canplay', autoplayOnce);
+    
+    // Fallback: also try after 2 seconds in case canplay doesn't fire
+    setTimeout(() => {
+      if (!this.isPlaying) {
+        console.log('Fallback: src=', this.audio.src, 'volume=', this.audio.volume, 'isPlaying=', this.isPlaying);
+        this.audio.muted = true;
+        this.audio.play().then(() => {
+          console.log('Fallback play succeeded, unmuting');
+          this.audio.muted = false;
+          this.incrementPlayCount();
+        }).catch(err => console.log('Fallback autoplay error:', err.message));
+      }
+    }, 2000);
   }
 
   updateSongsList() {
@@ -359,8 +361,9 @@ class WinampPlayer {
 }
 
 // Initialize player when DOM is loaded
+let player;
 document.addEventListener('DOMContentLoaded', () => {
-  new WinampPlayer();
+  player = new WinampPlayer();
   initPrankModal();
 });
 
@@ -387,6 +390,8 @@ function initPrankModal() {
         clearInterval(interval);
         setTimeout(() => {
           modal.style.display = 'none';
+          // Start autoplay after prank is dismissed
+          player.startAutoplay();
         }, 500);
       }
     }, 300);
@@ -394,5 +399,7 @@ function initPrankModal() {
 
   closeBtn.addEventListener('click', () => {
     modal.style.display = 'none';
+    // Start autoplay after prank is dismissed
+    player.startAutoplay();
   });
 }
