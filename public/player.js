@@ -84,8 +84,8 @@ class WinampPlayer {
         // Auto-play after a short delay to ensure audio is ready
         setTimeout(() => {
           this.audio.muted = false;
-          this.audio.play();
-        }, 500);
+          this.audio.play().catch(err => console.log('Autoplay error:', err));
+        }, 1000);
       }
     } catch (error) {
       console.error('Failed to load playlists:', error);
@@ -128,8 +128,6 @@ class WinampPlayer {
 
     if (this.currentPlaylist.length > 0) {
       this.loadTrack(0);
-      // Autoplay - will unmute after it starts
-      this.play();
     }
   }
 
