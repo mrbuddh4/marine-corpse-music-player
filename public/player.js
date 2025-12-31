@@ -280,6 +280,7 @@ class WinampPlayer {
   startVisualizer() {
     const canvas = this.visualizerCanvas;
     const ctx = canvas.getContext('2d');
+    let animationPhase = 0;
 
     const initAudio = () => {
       if (!this.audioContext) {
@@ -298,31 +299,35 @@ class WinampPlayer {
 
     const draw = () => {
       requestAnimationFrame(draw);
-
-      if (!this.analyser) {
-        // Draw idle state
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        return;
-      }
-
-      const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
-      this.analyser.getByteFrequencyData(dataArray);
+      animationPhase += 0.02;
 
       ctx.fillStyle = '#000';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Simple visualizer with just 10 bars
       const barCount = 10;
       const barWidth = canvas.width / barCount;
       
-      for (let i = 0; i < barCount; i++) {
-        const dataIndex = Math.floor((i / barCount) * dataArray.length);
-        const barHeight = (dataArray[dataIndex] / 255) * canvas.height;
+      if (this.analyser) {
+        // Draw actual audio data
+        const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+        this.analyser.getByteFrequencyData(dataArray);
         
-        // Green color
-        ctx.fillStyle = '#00ff00';
-        ctx.fillRect(i * barWidth + 2, canvas.height - barHeight, barWidth - 4, barHeight);
+        for (let i = 0; i < barCount; i++) {
+          const dataIndex = Math.floor((i / barCount) * dataArray.length);
+          const barHeight = (dataArray[dataIndex] / 255) * canvas.height;
+          
+          ctx.fillStyle = '#00ff00';
+          ctx.fillRect(i * barWidth + 2, canvas.height - barHeight, barWidth - 4, barHeight);
+        }
+      } else {
+        // Draw idle animation when no audio context
+        for (let i = 0; i < barCount; i++) {
+          const wave = Math.sin(animationPhase + i * 0.5) * 0.5 + 0.5;
+          const barHeight = wave * canvas.height * 0.6;
+          
+          ctx.fillStyle = '#00ff00';
+          ctx.fillRect(i * barWidth + 2, canvas.height - barHeight, barWidth - 4, barHeight);
+        }
       }
     };
 
