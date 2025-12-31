@@ -131,33 +131,12 @@ class WinampPlayer {
   }
 
   startAutoplay() {
-    // Autoplay when audio is ready - play while muted, then unmute
-    let autoplayTriggered = false;
-    
-    const autoplayOnce = () => {
-      if (autoplayTriggered) return; // Prevent double-triggering
-      autoplayTriggered = true;
-      
-      this.audio.muted = true; // Ensure muted
-      this.audio.play().then(() => {
-        this.audio.muted = false; // Unmute after play starts
-        this.incrementPlayCount();
-      }).catch(err => console.log('Autoplay error:', err.message));
-      this.audio.removeEventListener('canplay', autoplayOnce);
-    };
-    this.audio.addEventListener('canplay', autoplayOnce);
-    
-    // Fallback: also try after 2 seconds in case canplay doesn't fire
-    setTimeout(() => {
-      if (!autoplayTriggered && !this.isPlaying) {
-        autoplayTriggered = true;
-        this.audio.muted = true;
-        this.audio.play().then(() => {
-          this.audio.muted = false;
-          this.incrementPlayCount();
-        }).catch(err => console.log('Fallback autoplay error:', err.message));
-      }
-    }, 2000);
+    // Play immediately - audio src is already loaded from selectAlbum
+    this.audio.muted = true; // Ensure muted for autoplay policy
+    this.audio.play().then(() => {
+      this.audio.muted = false; // Unmute once playing
+      this.incrementPlayCount();
+    }).catch(err => console.log('Autoplay error:', err.message));
   }
 
   updateSongsList() {
