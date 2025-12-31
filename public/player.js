@@ -231,7 +231,7 @@ class WinampPlayer {
       this.audio.pause();
     } else {
       this.audio.play();
-      this.incrementPlayCount();
+      // incrementPlayCount is now handled in the play event listener
     }
   }
 
@@ -266,8 +266,7 @@ class WinampPlayer {
     this.audio.play().catch(err => {
       console.log('Play error:', err);
     });
-    
-    this.incrementPlayCount();
+    // incrementPlayCount is now handled in the play event listener
   }
 
   updatePlayCountDisplay() {
