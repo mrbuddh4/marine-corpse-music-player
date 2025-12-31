@@ -15,7 +15,6 @@ class WinampPlayer {
     this.initElements();
     this.setupEventListeners();
     this.loadPlaylists();
-    this.startVisualizer();
     this.updatePlayCountDisplay();
   }
 
@@ -33,7 +32,6 @@ class WinampPlayer {
     this.songArtist = document.getElementById('songArtist');
     this.songDuration = document.getElementById('songDuration');
     this.albumArt = document.getElementById('albumArt');
-    this.visualizerCanvas = document.getElementById('visualizer');
     this.lyricsDisplay = document.getElementById('lyrics');
     this.playCountDisplay = document.getElementById('playCount');
   }
@@ -304,79 +302,6 @@ class WinampPlayer {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   }
 
-  startVisualizer() {
-    const canvas = this.visualizerCanvas;
-    const ctx = canvas.getContext('2d');
-    
-    // Set canvas resolution
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-    
-    const barCount = 10;
-    let animationPhase = 0;
-    let lastBarHeights = new Array(barCount).fill(0);
-    let debugCounter = 0;
-
-    const draw = () => {
-      requestAnimationFrame(draw);
-      animationPhase += 0.05;
-
-      ctx.fillStyle = '#000';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      const barWidth = canvas.width / barCount;
-      
-      // Check if audio is actually playing
-      const isAudioPlaying = this.audio && !this.audio.paused && this.audio.currentTime > 0;
-      const audioVolume = this.audio ? this.audio.volume : 0;
-      
-      // Try to get time-domain data instead of frequency
-      let audioData = null;
-      let hasAudioData = false;
-      if (isAudioPlaying && this.analyser) {
-        try {
-          audioData = new Uint8Array(this.analyser.frequencyBinCount);
-          this.analyser.getByteTimeDomainData(audioData);
-          // Check if we actually have data (should not all be 128)
-          const sum = audioData.reduce((a, b) => a + Math.abs(b - 128), 0);
-          hasAudioData = sum > 100;
-          
-          debugCounter++;
-          if (debugCounter % 60 === 0) {
-            console.log('Audio data sum:', sum, 'Has data:', hasAudioData);
-          }
-        } catch (e) {
-          // Silent fail
-        }
-      }
-      
-      for (let i = 0; i < barCount; i++) {
-        let barHeight = 0;
-        
-        if (isAudioPlaying) {
-          if (hasAudioData && audioData) {
-            // Use actual audio data
-            const dataIndex = Math.floor((i / barCount) * audioData.length);
-            barHeight = Math.abs((audioData[dataIndex] - 128) / 128) * canvas.height * 0.9;
-          } else {
-            // Fallback: pulse based on audio volume and time
-            const pulsePhase = animationPhase + (i / barCount) * Math.PI * 2;
-            const basePulse = Math.sin(pulsePhase) * 0.5 + 0.5;
-            barHeight = (basePulse + audioVolume * 0.5) * canvas.height * 0.8;
-          }
-          // Minimum height when playing
-          barHeight = Math.max(barHeight, 6);
-        }
-        
-        // Smooth the transition between heights
-        lastBarHeights[i] = lastBarHeights[i] * 0.6 + barHeight * 0.4;
-        
-        ctx.fillStyle = '#00ff00';
-        ctx.fillRect(i * barWidth + 2, canvas.height - lastBarHeights[i], barWidth - 4, lastBarHeights[i]);
-      }
-    };
-
-    draw();
   }
 }
 
