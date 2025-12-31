@@ -409,39 +409,30 @@ class WinampPlayer {
   }
 
   extractFrequencyBands(samples, numBands) {
-    // Simple frequency extraction using FFT approximation
-    const fft = this.simpleFFT(samples);
+    // Use RMS (root mean square) for each band - standard audio amplitude measurement
     const bands = [];
-    const bandsPerFrequency = Math.floor(fft.length / numBands);
+    const samplesPerBand = Math.floor(samples.length / numBands);
     
     for (let i = 0; i < numBands; i++) {
+      const start = i * samplesPerBand;
+      const end = Math.min(start + samplesPerBand, samples.length);
+      const bandSamples = samples.slice(start, end);
+      
+      // Calculate RMS (root mean square) of this band
       let sum = 0;
-      for (let j = 0; j < bandsPerFrequency; j++) {
-        sum += Math.abs(fft[i * bandsPerFrequency + j]);
+      for (let sample of bandSamples) {
+        sum += sample * sample;
       }
-      bands.push(Math.min(sum / bandsPerFrequency / 100, 1)); // Normalize to 0-1
+      const rms = Math.sqrt(sum / bandSamples.length);
+      
+      // Scale RMS to 0-1 range (typical audio values are -1 to 1, so RMS is 0-0.7)
+      // Multiply by 2 to get better visibility
+      bands.push(Math.min(rms * 2, 1));
     }
     
     return bands;
   }
 
-  simpleFFT(samples) {
-    // Simple DFT approximation (not true FFT but good enough for visualization)
-    const n = Math.min(samples.length, 128);
-    const freqs = new Float32Array(64);
-    
-    for (let k = 0; k < freqs.length; k++) {
-      let real = 0, imag = 0;
-      for (let t = 0; t < n; t++) {
-        const angle = (2 * Math.PI * k * t) / n;
-        real += samples[t] * Math.cos(angle);
-        imag += samples[t] * Math.sin(angle);
-      }
-      freqs[k] = Math.sqrt(real * real + imag * imag) / n;
-    }
-    
-    return freqs;
-  }
 
   startVisualizerAnimation() {
     console.log('Starting visualizer animation, audioData length:', this.audioData?.length);
