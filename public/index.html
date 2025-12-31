@@ -24,15 +24,18 @@
         <img id="albumArt" src="/images/placeholder.jpg" alt="Album Art" class="album-image">
       </div>
 
-      <!-- Visualizer Canvas -->
-      <canvas id="visualizer" class="visualizer"></canvas>
+      <!-- Visualizer and Info Display Row -->
+      <div class="viz-info-row">
+        <!-- Info Display -->
+        <div class="info-display">
+          <div class="song-title" id="songTitle">Select a song</div>
+          <div class="song-artist" id="songArtist">No song playing</div>
+          <div class="song-duration" id="songDuration">0:00 / 0:00</div>
+          <div class="play-counter">Total Plays: <span id="playCount">0</span></div>
+        </div>
 
-      <!-- Info Display -->
-      <div class="info-display">
-        <div class="song-title" id="songTitle">Select a song</div>
-        <div class="song-artist" id="songArtist">No song playing</div>
-        <div class="song-duration" id="songDuration">0:00 / 0:00</div>
-        <div class="play-counter">Total Plays: <span id="playCount">0</span></div>
+        <!-- Visualizer Canvas -->
+        <canvas id="visualizer" class="visualizer" width="60" height="60"></canvas>
       </div>
 
       <!-- Progress Bar -->
