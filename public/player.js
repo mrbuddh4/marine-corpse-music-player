@@ -98,9 +98,15 @@ class WinampPlayer {
     
     this.audio.addEventListener('timeupdate', () => this.updateProgress());
     this.audio.addEventListener('ended', () => this.onTrackEnd());
+    
+    // Unmute audio when it starts playing
     this.audio.addEventListener('play', () => {
       this.isPlaying = true;
       this.playBtn.textContent = '⏸';
+      // Unmute after a tiny delay to ensure audio is flowing
+      setTimeout(() => {
+        this.audio.muted = false;
+      }, 50);
     });
     this.audio.addEventListener('pause', () => {
       this.isPlaying = false;
@@ -237,13 +243,6 @@ class WinampPlayer {
     this.audio.play().catch(err => {
       console.log('Play error:', err);
     });
-    
-    // Unmute after audio starts playing
-    if (allowUnmute) {
-      setTimeout(() => {
-        this.audio.muted = false;
-      }, 100);
-    }
     
     this.incrementPlayCount();
   }
