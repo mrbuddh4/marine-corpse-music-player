@@ -1,5 +1,6 @@
 class WinampPlayer {
   constructor() {
+    console.log('WinampPlayer initializing...');
     this.audio = document.getElementById('audioPlayer');
     this.currentPlaylist = [];
     this.currentTrackIndex = 0;
@@ -60,8 +61,10 @@ class WinampPlayer {
 
   async loadPlaylists() {
     try {
+      console.log('Loading playlists...');
       const response = await fetch('/api/playlists');
       const playlists = await response.json();
+      console.log('Playlists loaded:', playlists.length, 'albums');
       
       // Sort albums chronologically by year (oldest to newest)
       playlists.sort((a, b) => a.year - b.year);
@@ -78,6 +81,7 @@ class WinampPlayer {
       
       // Auto-select first album
       if (playlists.length > 0) {
+        console.log('Auto-selecting first album:', playlists[0].name);
         this.albumSelect.value = playlists[0].id;
         this.selectAlbum(playlists[0].id);
         
@@ -93,7 +97,7 @@ class WinampPlayer {
         // Fallback: also try after 2 seconds in case canplay doesn't fire
         setTimeout(() => {
           if (!this.isPlaying) {
-            console.log('Fallback autoplay after timeout');
+            console.log('Fallback autoplay after timeout, src is:', this.audio.src);
             this.audio.muted = false;
             this.audio.play().catch(err => console.log('Autoplay error:', err));
           }
