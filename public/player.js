@@ -129,7 +129,6 @@ class WinampPlayer {
     this.audio.addEventListener('pause', () => {
       this.isPlaying = false;
       this.playBtn.textContent = '▶';
-      if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
     });
   }
 
