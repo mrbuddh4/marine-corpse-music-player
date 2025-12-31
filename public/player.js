@@ -301,8 +301,6 @@ class WinampPlayer {
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   }
-
-  }
 }
 
 // Initialize player when DOM is loaded
