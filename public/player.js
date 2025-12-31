@@ -280,6 +280,11 @@ class WinampPlayer {
   startVisualizer() {
     const canvas = this.visualizerCanvas;
     const ctx = canvas.getContext('2d');
+    
+    // Set canvas resolution
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    
     let animationPhase = 0;
 
     const initAudio = () => {
