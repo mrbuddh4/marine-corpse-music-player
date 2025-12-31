@@ -85,11 +85,13 @@ class WinampPlayer {
         this.albumSelect.value = playlists[0].id;
         this.selectAlbum(playlists[0].id);
         
-        // Auto-play when audio is ready
+        // Auto-play when audio is ready - play while muted, then unmute
         const autoplayOnce = () => {
           console.log('Audio ready, starting autoplay');
-          this.audio.muted = false;
-          this.audio.play().catch(err => console.log('Autoplay error:', err));
+          this.audio.play().then(() => {
+            console.log('Audio playing, unmuting');
+            this.audio.muted = false;
+          }).catch(err => console.log('Autoplay error:', err));
           this.audio.removeEventListener('canplay', autoplayOnce);
         };
         this.audio.addEventListener('canplay', autoplayOnce);
@@ -98,8 +100,10 @@ class WinampPlayer {
         setTimeout(() => {
           if (!this.isPlaying) {
             console.log('Fallback autoplay after timeout, src is:', this.audio.src);
-            this.audio.muted = false;
-            this.audio.play().catch(err => console.log('Autoplay error:', err));
+            this.audio.play().then(() => {
+              console.log('Fallback: audio playing, unmuting');
+              this.audio.muted = false;
+            }).catch(err => console.log('Autoplay error:', err));
           }
         }, 2000);
       }
