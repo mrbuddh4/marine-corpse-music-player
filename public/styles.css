@@ -114,14 +114,15 @@ body {
 }
 
 /* Visualizer */
-.visualizer {
-  width: 100%;
+#visualizer {
+  width: calc(100% - 4px);
   height: 60px;
   background: #000;
   display: block;
-  margin: 2px 2px 0 2px;
+  margin: 2px;
   border: 2px solid;
   border-color: #000000 #dfdfdf #dfdfdf #000000;
+  box-sizing: border-box;
 }
 
 /* Progress Bar */
