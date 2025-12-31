@@ -198,8 +198,10 @@ class WinampPlayer {
     if (this.isPlaying) {
       this.audio.pause();
     } else {
-      // User interaction - unmute and play
-      this.play(true);
+      // Unmute and resume
+      this.audio.muted = false;
+      this.audio.play();
+      this.incrementPlayCount();
     }
   }
 
