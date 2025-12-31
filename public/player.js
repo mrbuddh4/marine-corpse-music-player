@@ -111,9 +111,13 @@ class WinampPlayer {
       this.playBtn.textContent = '⏸';
       
       // Only count as a play if starting from the beginning (within 1 second) and not already counted
+      console.log('Play event: currentTime=', this.audio.currentTime, 'flag=', this.playCountedForCurrentTrack);
       if (this.audio.currentTime < 1 && !this.playCountedForCurrentTrack) {
+        console.log('Incrementing play count');
         this.playCountedForCurrentTrack = true;
         this.incrementPlayCount();
+      } else {
+        console.log('Skipping increment');
       }
     });
     this.audio.addEventListener('pause', () => {
