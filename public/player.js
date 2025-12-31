@@ -360,20 +360,17 @@ class WinampPlayer {
 
   async loadAudioData(track) {
     try {
-      console.log('Loading audio data for visualizer...');
       const response = await fetch(track.file);
       const arrayBuffer = await response.arrayBuffer();
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
       const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-      console.log('Audio decoded, duration:', audioBuffer.duration);
       this.analyzeAudioBuffer(audioBuffer);
     } catch (err) {
-      console.log('Error loading audio data for visualization:', err);
+      console.error('Error loading audio data for visualization:', err);
     }
   }
 
   analyzeAudioBuffer(audioBuffer) {
-    console.log('Analyzing audio buffer...');
     const offlineContext = new OfflineAudioContext(audioBuffer.numberOfChannels, audioBuffer.length, audioBuffer.sampleRate);
     const source = offlineContext.createBufferSource();
     source.buffer = audioBuffer;
@@ -384,7 +381,6 @@ class WinampPlayer {
     source.start(0);
 
     offlineContext.startRendering().then(() => {
-      console.log('Offline rendering complete, extracting frequency bands...');
       const frequencyBands = [];
       const totalDuration = audioBuffer.duration;
       const sampleInterval = 0.05;
@@ -399,12 +395,10 @@ class WinampPlayer {
         frequencyBands.push({ time, bands });
       }
       
-      console.log('Frequency bands extracted:', frequencyBands.length, 'samples');
       this.audioData = frequencyBands;
-      console.log('Audio data set, starting animation');
       this.startVisualizerAnimation();
     }).catch(err => {
-      console.log('Offline rendering error:', err);
+      console.error('Offline rendering error:', err);
     });
   }
 
@@ -435,7 +429,6 @@ class WinampPlayer {
 
 
   startVisualizerAnimation() {
-    console.log('Starting visualizer animation, audioData length:', this.audioData?.length);
     if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
     
     const animate = () => {
@@ -454,7 +447,6 @@ class WinampPlayer {
           }
         }
         
-        console.log('Drawing visualizer with bands:', closestData.bands);
         this.drawVisualizer(closestData.bands);
       }
       
@@ -465,16 +457,11 @@ class WinampPlayer {
   }
 
   drawVisualizer(bands) {
-    if (!this.visualizerCtx) {
-      console.log('No visualizer context available');
-      return;
-    }
+    if (!this.visualizerCtx) return;
 
     const ctx = this.visualizerCtx;
     const width = this.visualizerCanvas.width;
     const height = this.visualizerCanvas.height;
-    
-    console.log('Drawing to canvas:', width, 'x', height);
     
     // Clear canvas
     ctx.fillStyle = '#000';
@@ -492,7 +479,6 @@ class WinampPlayer {
       const barHeight = bands[i] * height;
       const x = i * barWidth;
       const y = height - barHeight;
-      console.log(`Bar ${i}: height=${barHeight}, x=${x}, y=${y}`);
       ctx.fillRect(x + 2, y, barWidth - 4, barHeight);
     }
   }
