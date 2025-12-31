@@ -315,7 +315,6 @@ class WinampPlayer {
     canvas.height = canvas.offsetHeight;
     
     let animationPhase = 0;
-    let lastDataValues = new Array(10).fill(0);
 
     const draw = () => {
       requestAnimationFrame(draw);
@@ -327,44 +326,50 @@ class WinampPlayer {
       const barCount = 10;
       const barWidth = canvas.width / barCount;
       
-      let hasAudioData = false;
       let dataArray = null;
+      let hasAudio = false;
       
-      if (this.analyser && this.audio.currentTime > 0) {
+      // Try to get time-domain data from analyser
+      if (this.analyser && this.audio.currentTime > 0 && !this.audio.paused) {
         try {
           dataArray = new Uint8Array(this.analyser.frequencyBinCount);
-          this.analyser.getByteFrequencyData(dataArray);
+          this.analyser.getByteTimeDomainData(dataArray);
           
-          // Check if we have actual data
-          const sum = dataArray.reduce((a, b) => a + b, 0);
-          if (sum > 0) {
-            hasAudioData = true;
+          // Check if we have actual audio data
+          const sum = dataArray.reduce((a, b) => a + Math.abs(b - 128), 0);
+          if (sum > 100) {
+            hasAudio = true;
           }
         } catch (e) {
-          // Silent fail
+          console.error('Analyser error:', e);
         }
       }
       
       for (let i = 0; i < barCount; i++) {
         let barHeight;
         
-        if (hasAudioData && dataArray) {
-          // Use audio data - sample across a wider range
+        if (hasAudio && dataArray) {
+          // Use waveform data - sample across the entire array for each bar
           const startIdx = Math.floor((i / barCount) * dataArray.length);
           const endIdx = Math.floor(((i + 1) / barCount) * dataArray.length);
-          let avg = 0;
+          let sum = 0;
+          let count = 0;
+          
           for (let j = startIdx; j < endIdx; j++) {
-            avg += dataArray[j];
+            sum += Math.abs(dataArray[j] - 128);
+            count++;
           }
-          avg = avg / (endIdx - startIdx);
-          lastDataValues[i] = avg;
-          barHeight = (avg / 255) * canvas.height * 0.9;
+          
+          const avg = count > 0 ? sum / count : 0;
+          barHeight = (avg / 128) * canvas.height * 0.9;
         } else {
-          // Use idle animation mixed with last data
+          // Use idle animation when no audio
           const wave = Math.sin(animationPhase + i * 0.5) * 0.5 + 0.5;
           barHeight = wave * canvas.height * 0.6;
-          lastDataValues[i] = wave * 150;
         }
+        
+        // Ensure minimum visible height
+        if (barHeight < 2) barHeight = 2;
         
         ctx.fillStyle = '#00ff00';
         ctx.fillRect(i * barWidth + 2, canvas.height - barHeight, barWidth - 4, barHeight);
