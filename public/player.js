@@ -198,6 +198,7 @@ class WinampPlayer {
     this.songTitle.textContent = track.title;
     this.songArtist.textContent = this.currentAlbum?.artist || 'Unknown Artist';
     this.progressBar.max = track.duration;
+    this.progressBar.value = 0; // Reset progress bar to start
     
     // Fetch lyrics from text file
     this.loadLyrics(track);
