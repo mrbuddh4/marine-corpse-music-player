@@ -120,7 +120,8 @@ class WinampPlayer {
 
     if (this.currentPlaylist.length > 0) {
       this.loadTrack(0);
-      this.play();
+      // Autoplay muted (doesn't require user interaction)
+      this.play(false);
     }
   }
 
@@ -197,11 +198,12 @@ class WinampPlayer {
     if (this.isPlaying) {
       this.audio.pause();
     } else {
-      this.audio.play();
+      // User interaction - unmute and play
+      this.play(true);
     }
   }
 
-  play() {
+  play(allowUnmute = true) {
     // Initialize audio context on first play (after user interaction)
     if (!this.audioContextInitialized) {
       try {
@@ -229,7 +231,11 @@ class WinampPlayer {
       this.audioContext.resume();
     }
     
-    this.audio.muted = false;
+    // Only unmute if explicitly allowed (user interaction)
+    if (allowUnmute) {
+      this.audio.muted = false;
+    }
+    
     this.audio.play().catch(err => {
       console.log('Play error:', err);
     });
