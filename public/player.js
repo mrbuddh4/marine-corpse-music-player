@@ -10,22 +10,7 @@ class WinampPlayer {
     this.playCount = parseInt(localStorage.getItem('playCount')) || 0;
     this.audioContext = null;
     this.analyser = null;
-    
-    // Initialize audio context immediately (MUST happen before any audio plays)
-    try {
-      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      this.analyser = this.audioContext.createAnalyser();
-      this.analyser.fftSize = 256;
-      this.analyser.smoothingTimeConstant = 0.8;
-      
-      // Create source and connect IMMEDIATELY - this is critical
-      const source = this.audioContext.createMediaElementAudioSource(this.audio);
-      source.connect(this.analyser);
-      this.analyser.connect(this.audioContext.destination);
-      console.log('Audio context and source initialized in constructor');
-    } catch (e) {
-      console.error('Audio context init error:', e);
-    }
+    this.audioContextInitialized = false;
     
     this.initElements();
     this.setupEventListeners();
@@ -202,6 +187,24 @@ class WinampPlayer {
   }
 
   play() {
+    // Initialize audio context on first play (after user interaction)
+    if (!this.audioContextInitialized) {
+      try {
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        this.analyser = this.audioContext.createAnalyser();
+        this.analyser.fftSize = 256;
+        this.analyser.smoothingTimeConstant = 0.8;
+        
+        const source = this.audioContext.createMediaElementAudioSource(this.audio);
+        source.connect(this.analyser);
+        this.analyser.connect(this.audioContext.destination);
+        this.audioContextInitialized = true;
+        console.log('Audio context and source initialized on first play');
+      } catch (e) {
+        console.error('Audio context init error:', e);
+      }
+    }
+    
     // Resume audio context if it's suspended
     if (this.audioContext) {
       console.log('Audio context state:', this.audioContext.state);
