@@ -134,6 +134,7 @@ class WinampPlayer {
 
     if (this.currentPlaylist.length > 0) {
       this.loadTrack(0);
+      this.startAutoplay(); // Autoplay when album is selected
     }
   }
 
