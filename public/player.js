@@ -301,7 +301,7 @@ class WinampPlayer {
       const isAudioPlaying = this.audio && !this.audio.paused && this.audio.currentTime > 0;
       
       for (let i = 0; i < barCount; i++) {
-        let barHeight;
+        let barHeight = 0;
         
         if (isAudioPlaying) {
           // When playing, show animated bars with slight variations
@@ -310,11 +310,8 @@ class WinampPlayer {
           const variance = Math.sin(pulsePhase * 1.5 + i * 0.3) * 0.25;
           barHeight = (basePulse + variance) * canvas.height * 0.85;
           barHeight = Math.max(barHeight, 8); // Minimum height when playing
-        } else {
-          // Idle wave when not playing
-          const wave = Math.sin(animationPhase + i * 0.5) * 0.5 + 0.5;
-          barHeight = wave * canvas.height * 0.5;
         }
+        // When idle, barHeight stays at 0
         
         ctx.fillStyle = '#00ff00';
         ctx.fillRect(i * barWidth + 2, canvas.height - barHeight, barWidth - 4, barHeight);
