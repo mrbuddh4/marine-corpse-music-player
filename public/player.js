@@ -309,6 +309,7 @@ class WinampPlayer {
     canvas.height = canvas.offsetHeight;
     
     let animationPhase = 0;
+    let lastDataValues = new Array(10).fill(0);
 
     const draw = () => {
       requestAnimationFrame(draw);
@@ -320,29 +321,43 @@ class WinampPlayer {
       const barCount = 10;
       const barWidth = canvas.width / barCount;
       
+      let hasAudioData = false;
       let dataArray = null;
-      if (this.analyser) {
+      
+      if (this.analyser && this.audio.currentTime > 0) {
         try {
           dataArray = new Uint8Array(this.analyser.frequencyBinCount);
           this.analyser.getByteFrequencyData(dataArray);
+          
+          // Check if we have actual data
+          const sum = dataArray.reduce((a, b) => a + b, 0);
+          if (sum > 0) {
+            hasAudioData = true;
+          }
         } catch (e) {
-          console.error('Analyser error:', e);
+          // Silent fail
         }
       }
       
       for (let i = 0; i < barCount; i++) {
         let barHeight;
         
-        if (dataArray && dataArray.length > 0) {
-          // Use audio data
-          const dataIndex = Math.floor((i / barCount) * dataArray.length);
-          barHeight = (dataArray[dataIndex] / 255) * canvas.height * 0.8;
-          // Ensure visible bars even with low audio
-          if (barHeight < 2) barHeight = 2;
+        if (hasAudioData && dataArray) {
+          // Use audio data - sample across a wider range
+          const startIdx = Math.floor((i / barCount) * dataArray.length);
+          const endIdx = Math.floor(((i + 1) / barCount) * dataArray.length);
+          let avg = 0;
+          for (let j = startIdx; j < endIdx; j++) {
+            avg += dataArray[j];
+          }
+          avg = avg / (endIdx - startIdx);
+          lastDataValues[i] = avg;
+          barHeight = (avg / 255) * canvas.height * 0.9;
         } else {
-          // Use idle animation
+          // Use idle animation mixed with last data
           const wave = Math.sin(animationPhase + i * 0.5) * 0.5 + 0.5;
           barHeight = wave * canvas.height * 0.6;
+          lastDataValues[i] = wave * 150;
         }
         
         ctx.fillStyle = '#00ff00';
