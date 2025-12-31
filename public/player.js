@@ -186,7 +186,11 @@ class WinampPlayer {
     // Initialize audio context on first play (after user interaction)
     if (!this.audioContextInitialized) {
       try {
-        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        this.audioContext = new AudioContextClass();
+        console.log('AudioContext type:', this.audioContext.constructor.name);
+        console.log('Has createMediaElementAudioSource:', typeof this.audioContext.createMediaElementAudioSource);
+        
         this.analyser = this.audioContext.createAnalyser();
         this.analyser.fftSize = 256;
         this.analyser.smoothingTimeConstant = 0.8;
@@ -198,6 +202,7 @@ class WinampPlayer {
         console.log('Audio context and source initialized on first play');
       } catch (e) {
         console.error('Audio context init error:', e);
+        console.error('AudioContext:', this.audioContext);
       }
     }
     
@@ -208,6 +213,9 @@ class WinampPlayer {
         // Unmute after context resumes
         this.audio.muted = false;
       });
+    } else if (this.audioContext) {
+      // If not suspended, just unmute
+      this.audio.muted = false;
     }
     
     this.audio.play().catch(err => {
