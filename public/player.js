@@ -315,6 +315,7 @@ class WinampPlayer {
     canvas.height = canvas.offsetHeight;
     
     let animationPhase = 0;
+    let debugCounter = 0;
 
     const draw = () => {
       requestAnimationFrame(draw);
@@ -339,6 +340,12 @@ class WinampPlayer {
           const sum = dataArray.reduce((a, b) => a + Math.abs(b - 128), 0);
           if (sum > 100) {
             hasAudio = true;
+          }
+          
+          // Debug logging every 30 frames
+          debugCounter++;
+          if (debugCounter % 30 === 0) {
+            console.log('Analyser:', this.analyser ? 'exists' : 'null', 'FFT:', this.analyser?.fftSize, 'Sum:', sum, 'DataLen:', dataArray.length);
           }
         } catch (e) {
           console.error('Analyser error:', e);
