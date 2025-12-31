@@ -482,3 +482,15 @@ body {
 .prank-btn:hover:not(:active) {
   background: #e0e0e0;
 }
+
+/* Version Number */
+.version-number {
+  position: fixed;
+  bottom: 8px;
+  right: 8px;
+  font-family: 'MS Sans Serif', Arial, sans-serif;
+  font-size: 10px;
+  color: #666;
+  background: transparent;
+  z-index: 9999;
+}
