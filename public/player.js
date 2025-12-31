@@ -76,10 +76,16 @@ class WinampPlayer {
       
       this.playlists = playlists;
       
-      // Auto-select first album (which triggers autoplay)
+      // Auto-select first album
       if (playlists.length > 0) {
         this.albumSelect.value = playlists[0].id;
         this.selectAlbum(playlists[0].id);
+        
+        // Auto-play after a short delay to ensure audio is ready
+        setTimeout(() => {
+          this.audio.muted = false;
+          this.audio.play();
+        }, 500);
       }
     } catch (error) {
       console.error('Failed to load playlists:', error);
@@ -103,10 +109,6 @@ class WinampPlayer {
     this.audio.addEventListener('play', () => {
       this.isPlaying = true;
       this.playBtn.textContent = '⏸';
-      // Unmute after a tiny delay to ensure audio is flowing
-      setTimeout(() => {
-        this.audio.muted = false;
-      }, 50);
     });
     this.audio.addEventListener('pause', () => {
       this.isPlaying = false;
