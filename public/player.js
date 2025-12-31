@@ -88,12 +88,13 @@ class WinampPlayer {
         
         // Auto-play when audio is ready - play while muted, then unmute
         const autoplayOnce = () => {
-          console.log('Audio ready, starting autoplay, src:', this.audio.src);
+          console.log('Audio ready, starting autoplay, src:', this.audio.src, 'duration:', this.audio.duration);
           this.audio.muted = true; // Explicitly ensure muted
           this.audio.play().then(() => {
-            console.log('Audio playing, unmuting');
+            console.log('Audio playing SUCCESS, isPlaying:', this.isPlaying, 'volume:', this.audio.volume, 'unmuting now...');
             this.audio.muted = false;
-          }).catch(err => console.log('Autoplay error:', err));
+            console.log('Audio unmuted:', this.audio.muted);
+          }).catch(err => console.log('Autoplay canplay error:', err.message));
           this.audio.removeEventListener('canplay', autoplayOnce);
         };
         this.audio.addEventListener('canplay', autoplayOnce);
@@ -101,12 +102,15 @@ class WinampPlayer {
         // Fallback: also try after 2 seconds in case canplay doesn't fire
         setTimeout(() => {
           if (!this.isPlaying) {
-            console.log('Fallback autoplay after timeout, src is:', this.audio.src);
+            console.log('Fallback autoplay after timeout, src is:', this.audio.src, 'duration:', this.audio.duration);
             this.audio.muted = true; // Explicitly ensure muted
             this.audio.play().then(() => {
-              console.log('Fallback: audio playing, unmuting');
+              console.log('Fallback play SUCCESS, unmuting now...');
               this.audio.muted = false;
-            }).catch(err => console.log('Autoplay error:', err));
+              console.log('Audio unmuted:', this.audio.muted);
+            }).catch(err => console.log('Autoplay fallback error:', err.message));
+          } else {
+            console.log('Already playing, skipping fallback');
           }
         }, 2000);
       }
@@ -130,12 +134,19 @@ class WinampPlayer {
     
     // Unmute audio when it starts playing
     this.audio.addEventListener('play', () => {
+      console.log('PLAY EVENT FIRED');
       this.isPlaying = true;
       this.playBtn.textContent = '⏸';
     });
     this.audio.addEventListener('pause', () => {
       this.isPlaying = false;
       this.playBtn.textContent = '▶';
+    });
+    this.audio.addEventListener('playing', () => {
+      console.log('PLAYING EVENT FIRED');
+    });
+    this.audio.addEventListener('ended', () => {
+      console.log('ENDED EVENT FIRED');
     });
   }
 
