@@ -43,12 +43,9 @@ class WinampPlayer {
 
   async fetchPlayCount() {
     try {
-      console.log('Fetching initial play count...');
       const response = await fetch('/api/play-count');
       const data = await response.json();
-      console.log('Fetched play count:', data.count);
       this.playCount = data.count || 0;
-      console.log('Set playCount to:', this.playCount);
       this.updatePlayCountDisplay();
     } catch (error) {
       console.error('Failed to fetch play count:', error);
@@ -57,12 +54,9 @@ class WinampPlayer {
 
   async incrementPlayCount() {
     try {
-      console.log('Incrementing play count, current:', this.playCount);
       const response = await fetch('/api/play-count', { method: 'POST' });
       const data = await response.json();
-      console.log('Response:', data);
       this.playCount = data.count || 0;
-      console.log('Updated play count to:', this.playCount);
       this.updatePlayCountDisplay();
     } catch (error) {
       console.error('Failed to increment play count:', error);
@@ -144,10 +138,8 @@ class WinampPlayer {
       if (autoplayTriggered) return; // Prevent double-triggering
       autoplayTriggered = true;
       
-      console.log('Canplay event: src=', this.audio.src, 'volume=', this.audio.volume);
       this.audio.muted = true; // Ensure muted
       this.audio.play().then(() => {
-        console.log('Play succeeded, unmuting');
         this.audio.muted = false; // Unmute after play starts
         this.incrementPlayCount();
       }).catch(err => console.log('Autoplay error:', err.message));
@@ -158,11 +150,9 @@ class WinampPlayer {
     // Fallback: also try after 2 seconds in case canplay doesn't fire
     setTimeout(() => {
       if (!autoplayTriggered && !this.isPlaying) {
-        console.log('Fallback: src=', this.audio.src, 'volume=', this.audio.volume, 'isPlaying=', this.isPlaying);
         autoplayTriggered = true;
         this.audio.muted = true;
         this.audio.play().then(() => {
-          console.log('Fallback play succeeded, unmuting');
           this.audio.muted = false;
           this.incrementPlayCount();
         }).catch(err => console.log('Fallback autoplay error:', err.message));
