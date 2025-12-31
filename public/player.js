@@ -8,6 +8,7 @@ class WinampPlayer {
     this.repeatMode = 0; // 0: no repeat, 1: repeat all, 2: repeat one
     this.shuffledIndices = [];
     this.playCount = parseInt(localStorage.getItem('playCount')) || 0;
+    this.contextInitStarted = false;
     
     this.initElements();
     this.setupEventListeners();
@@ -186,6 +187,23 @@ class WinampPlayer {
   }
 
   play() {
+    // Initialize audio context if needed
+    if (!this.audioContext && !this.contextInitStarted) {
+      this.contextInitStarted = true;
+      try {
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        this.analyser = this.audioContext.createAnalyser();
+        this.analyser.fftSize = 256;
+        
+        const source = this.audioContext.createMediaElementAudioSource(this.audio);
+        source.connect(this.analyser);
+        this.analyser.connect(this.audioContext.destination);
+        console.log('Audio context initialized on play');
+      } catch (e) {
+        console.error('Audio context error:', e);
+      }
+    }
+    
     this.audio.play().catch(() => {});
     this.playCount++;
     localStorage.setItem('playCount', this.playCount);
@@ -287,26 +305,6 @@ class WinampPlayer {
     
     let animationPhase = 0;
 
-    const initAudio = () => {
-      if (!this.audioContext) {
-        try {
-          this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-          this.analyser = this.audioContext.createAnalyser();
-          this.analyser.fftSize = 256;
-          
-          const source = this.audioContext.createMediaElementAudioSource(this.audio);
-          source.connect(this.analyser);
-          this.analyser.connect(this.audioContext.destination);
-          console.log('Audio context initialized');
-        } catch (e) {
-          console.error('Audio context error:', e);
-        }
-      }
-    };
-
-    // Initialize audio context on first user interaction
-    document.addEventListener('click', initAudio, { once: true });
-
     const draw = () => {
       requestAnimationFrame(draw);
       animationPhase += 0.02;
@@ -319,8 +317,12 @@ class WinampPlayer {
       
       let dataArray = null;
       if (this.analyser) {
-        dataArray = new Uint8Array(this.analyser.frequencyBinCount);
-        this.analyser.getByteFrequencyData(dataArray);
+        try {
+          dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+          this.analyser.getByteFrequencyData(dataArray);
+        } catch (e) {
+          console.error('Analyser error:', e);
+        }
       }
       
       for (let i = 0; i < barCount; i++) {
@@ -329,7 +331,9 @@ class WinampPlayer {
         if (dataArray && dataArray.length > 0) {
           // Use audio data
           const dataIndex = Math.floor((i / barCount) * dataArray.length);
-          barHeight = (dataArray[dataIndex] / 255) * canvas.height;
+          barHeight = (dataArray[dataIndex] / 255) * canvas.height * 0.8;
+          // Ensure visible bars even with low audio
+          if (barHeight < 2) barHeight = 2;
         } else {
           // Use idle animation
           const wave = Math.sin(animationPhase + i * 0.5) * 0.5 + 0.5;
