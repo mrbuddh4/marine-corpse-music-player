@@ -120,8 +120,8 @@ class WinampPlayer {
 
     if (this.currentPlaylist.length > 0) {
       this.loadTrack(0);
-      // Autoplay muted (doesn't require user interaction)
-      this.play(false);
+      // Autoplay - will unmute after it starts
+      this.play();
     }
   }
 
@@ -234,14 +234,17 @@ class WinampPlayer {
       this.audioContext.resume();
     }
     
-    // Only unmute if explicitly allowed (user interaction)
-    if (allowUnmute) {
-      this.audio.muted = false;
-    }
-    
     this.audio.play().catch(err => {
       console.log('Play error:', err);
     });
+    
+    // Unmute after audio starts playing
+    if (allowUnmute) {
+      setTimeout(() => {
+        this.audio.muted = false;
+      }, 100);
+    }
+    
     this.incrementPlayCount();
   }
 
