@@ -313,10 +313,12 @@ class WinampPlayer {
     canvas.height = canvas.offsetHeight;
     
     const barCount = 10;
+    let animationPhase = 0;
     let lastBarHeights = new Array(barCount).fill(0);
 
     const draw = () => {
       requestAnimationFrame(draw);
+      animationPhase += 0.05;
 
       ctx.fillStyle = '#000';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -325,13 +327,18 @@ class WinampPlayer {
       
       // Check if audio is actually playing
       const isAudioPlaying = this.audio && !this.audio.paused && this.audio.currentTime > 0;
+      const audioVolume = this.audio ? this.audio.volume : 0;
       
       // Try to get frequency data
       let frequencyData = null;
+      let hasFrequencyData = false;
       if (isAudioPlaying && this.analyser) {
         try {
           frequencyData = new Uint8Array(this.analyser.frequencyBinCount);
           this.analyser.getByteFrequencyData(frequencyData);
+          // Check if we actually have data
+          const sum = frequencyData.reduce((a, b) => a + b, 0);
+          hasFrequencyData = sum > 50;
         } catch (e) {
           // Silent fail
         }
@@ -341,17 +348,22 @@ class WinampPlayer {
         let barHeight = 0;
         
         if (isAudioPlaying) {
-          if (frequencyData) {
+          if (hasFrequencyData && frequencyData) {
             // Use actual frequency data
             const dataIndex = Math.floor((i / barCount) * frequencyData.length);
             barHeight = (frequencyData[dataIndex] / 255) * canvas.height * 0.95;
+          } else {
+            // Fallback: pulse based on audio volume and time
+            const pulsePhase = animationPhase + (i / barCount) * Math.PI * 2;
+            const basePulse = Math.sin(pulsePhase) * 0.5 + 0.5;
+            barHeight = (basePulse + audioVolume * 0.5) * canvas.height * 0.8;
           }
           // Minimum height when playing so bars are always visible
-          barHeight = Math.max(barHeight, 5);
+          barHeight = Math.max(barHeight, 6);
         }
         
         // Smooth the transition between heights
-        lastBarHeights[i] = lastBarHeights[i] * 0.7 + barHeight * 0.3;
+        lastBarHeights[i] = lastBarHeights[i] * 0.6 + barHeight * 0.4;
         
         ctx.fillStyle = '#00ff00';
         ctx.fillRect(i * barWidth + 2, canvas.height - lastBarHeights[i], barWidth - 4, lastBarHeights[i]);
