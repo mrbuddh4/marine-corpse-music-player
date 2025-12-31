@@ -1,6 +1,5 @@
 class WinampPlayer {
   constructor() {
-    console.log('WinampPlayer initializing...');
     this.audio = document.getElementById('audioPlayer');
     this.audio.muted = true; // Start muted for autoplay policy
     this.currentPlaylist = [];
@@ -62,10 +61,8 @@ class WinampPlayer {
 
   async loadPlaylists() {
     try {
-      console.log('Loading playlists...');
       const response = await fetch('/api/playlists');
       const playlists = await response.json();
-      console.log('Playlists loaded:', playlists.length, 'albums');
       
       // Sort albums chronologically by year (oldest to newest)
       playlists.sort((a, b) => a.year - b.year);
@@ -80,21 +77,17 @@ class WinampPlayer {
       
       this.playlists = playlists;
       
-      // Auto-select first album
+      // Auto-select first album and autoplay
       if (playlists.length > 0) {
-        console.log('Auto-selecting first album:', playlists[0].name);
         this.albumSelect.value = playlists[0].id;
         this.selectAlbum(playlists[0].id);
         
-        // Auto-play when audio is ready - play while muted, then unmute
+        // Autoplay when audio is ready - play while muted, then unmute
         const autoplayOnce = () => {
-          console.log('Audio ready, starting autoplay, src:', this.audio.src, 'duration:', this.audio.duration);
-          this.audio.muted = true; // Explicitly ensure muted
+          this.audio.muted = true; // Ensure muted
           this.audio.play().then(() => {
-            console.log('Audio playing SUCCESS, isPlaying:', this.isPlaying, 'volume:', this.audio.volume, 'unmuting now...');
-            this.audio.muted = false;
-            console.log('Audio unmuted:', this.audio.muted);
-          }).catch(err => console.log('Autoplay canplay error:', err.message));
+            this.audio.muted = false; // Unmute after play starts
+          }).catch(err => console.log('Autoplay error:', err.message));
           this.audio.removeEventListener('canplay', autoplayOnce);
         };
         this.audio.addEventListener('canplay', autoplayOnce);
@@ -102,15 +95,10 @@ class WinampPlayer {
         // Fallback: also try after 2 seconds in case canplay doesn't fire
         setTimeout(() => {
           if (!this.isPlaying) {
-            console.log('Fallback autoplay after timeout, src is:', this.audio.src, 'duration:', this.audio.duration);
-            this.audio.muted = true; // Explicitly ensure muted
+            this.audio.muted = true;
             this.audio.play().then(() => {
-              console.log('Fallback play SUCCESS, unmuting now...');
               this.audio.muted = false;
-              console.log('Audio unmuted:', this.audio.muted);
-            }).catch(err => console.log('Autoplay fallback error:', err.message));
-          } else {
-            console.log('Already playing, skipping fallback');
+            }).catch(err => console.log('Autoplay error:', err.message));
           }
         }, 2000);
       }
@@ -132,21 +120,14 @@ class WinampPlayer {
     this.audio.addEventListener('timeupdate', () => this.updateProgress());
     this.audio.addEventListener('ended', () => this.onTrackEnd());
     
-    // Unmute audio when it starts playing
+    // Audio event listeners
     this.audio.addEventListener('play', () => {
-      console.log('PLAY EVENT FIRED');
       this.isPlaying = true;
       this.playBtn.textContent = '⏸';
     });
     this.audio.addEventListener('pause', () => {
       this.isPlaying = false;
       this.playBtn.textContent = '▶';
-    });
-    this.audio.addEventListener('playing', () => {
-      console.log('PLAYING EVENT FIRED');
-    });
-    this.audio.addEventListener('ended', () => {
-      console.log('ENDED EVENT FIRED');
     });
   }
 
@@ -199,7 +180,6 @@ class WinampPlayer {
     if (this.currentPlaylist.length === 0) return;
     
     const track = this.currentPlaylist[index];
-    console.log('Loading track:', track.title, 'file:', track.file);
     this.audio.src = track.file;
     this.songTitle.textContent = track.title;
     this.songArtist.textContent = this.currentAlbum?.artist || 'Unknown Artist';
