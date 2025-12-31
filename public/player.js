@@ -380,23 +380,62 @@ class WinampPlayer {
     analyser.connect(offlineContext.destination);
     source.start(0);
 
-    // Sample the frequency data at regular intervals
-    const frequencyBands = [];
-    const dataArray = new Uint8Array(analyser.frequencyBinCount);
-    const totalDuration = audioBuffer.duration;
-    const sampleInterval = 0.1; // Sample every 100ms
-    
-    for (let time = 0; time < totalDuration; time += sampleInterval) {
-      offlineContext.suspend(time).then(() => {
-        analyser.getByteFrequencyData(dataArray);
-        const bands = Array.from(dataArray.slice(0, 8)).map(v => v / 255); // 8 bars
+    // Render the entire buffer
+    offlineContext.startRendering().then(() => {
+      // After rendering, sample frequency data at regular intervals
+      const frequencyBands = [];
+      const totalDuration = audioBuffer.duration;
+      const sampleInterval = 0.05; // Sample every 50ms for smoother animation
+      
+      for (let time = 0; time < totalDuration; time += sampleInterval) {
+        const sampleIndex = Math.floor((time / totalDuration) * audioBuffer.length);
+        const channelData = audioBuffer.getChannelData(0);
+        
+        // Extract frequency bands by analyzing sample chunks
+        const chunkSize = 256;
+        const chunk = channelData.slice(sampleIndex, sampleIndex + chunkSize);
+        const bands = this.extractFrequencyBands(chunk, 8);
         frequencyBands.push({ time, bands });
-        offlineContext.resume();
-      });
+      }
+      
+      this.audioData = frequencyBands;
+      this.startVisualizerAnimation();
+    });
+  }
+
+  extractFrequencyBands(samples, numBands) {
+    // Simple frequency extraction using FFT approximation
+    const fft = this.simpleFFT(samples);
+    const bands = [];
+    const bandsPerFrequency = Math.floor(fft.length / numBands);
+    
+    for (let i = 0; i < numBands; i++) {
+      let sum = 0;
+      for (let j = 0; j < bandsPerFrequency; j++) {
+        sum += Math.abs(fft[i * bandsPerFrequency + j]);
+      }
+      bands.push(Math.min(sum / bandsPerFrequency / 100, 1)); // Normalize to 0-1
     }
     
-    this.audioData = frequencyBands;
-    this.startVisualizerAnimation();
+    return bands;
+  }
+
+  simpleFFT(samples) {
+    // Simple DFT approximation (not true FFT but good enough for visualization)
+    const n = Math.min(samples.length, 128);
+    const freqs = new Float32Array(64);
+    
+    for (let k = 0; k < freqs.length; k++) {
+      let real = 0, imag = 0;
+      for (let t = 0; t < n; t++) {
+        const angle = (2 * Math.PI * k * t) / n;
+        real += samples[t] * Math.cos(angle);
+        imag += samples[t] * Math.sin(angle);
+      }
+      freqs[k] = Math.sqrt(real * real + imag * imag) / n;
+    }
+    
+    return freqs;
   }
 
   startVisualizerAnimation() {
