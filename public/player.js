@@ -7,11 +7,13 @@ class WinampPlayer {
     this.isShuffle = false;
     this.repeatMode = 0; // 0: no repeat, 1: repeat all, 2: repeat one
     this.shuffledIndices = [];
+    this.playCount = parseInt(localStorage.getItem('playCount')) || 0;
     
     this.initElements();
     this.setupEventListeners();
     this.loadPlaylists();
     this.startVisualizer();
+    this.updatePlayCountDisplay();
   }
 
   initElements() {
@@ -30,6 +32,7 @@ class WinampPlayer {
     this.albumArt = document.getElementById('albumArt');
     this.visualizerCanvas = document.getElementById('visualizer');
     this.lyricsDisplay = document.getElementById('lyrics');
+    this.playCountDisplay = document.getElementById('playCount');
     this.analyser = null;
     this.audioContext = null;
   }
@@ -184,6 +187,13 @@ class WinampPlayer {
 
   play() {
     this.audio.play().catch(() => {});
+    this.playCount++;
+    localStorage.setItem('playCount', this.playCount);
+    this.updatePlayCountDisplay();
+  }
+
+  updatePlayCountDisplay() {
+    this.playCountDisplay.textContent = this.playCount;
   }
 
   pause() {

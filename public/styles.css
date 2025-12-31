@@ -106,6 +106,13 @@ body {
   font-size: 10px;
 }
 
+.play-counter {
+  margin-top: 4px;
+  font-size: 10px;
+  padding-top: 4px;
+  border-top: 1px solid #333;
+}
+
 /* Visualizer */
 .visualizer {
   width: 100%;
