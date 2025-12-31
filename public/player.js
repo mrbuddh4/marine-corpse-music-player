@@ -108,6 +108,11 @@ class WinampPlayer {
     this.audio.addEventListener('play', () => {
       this.isPlaying = true;
       this.playBtn.textContent = '⏸';
+      
+      // Only count as a play if starting from the beginning (within 1 second)
+      if (this.audio.currentTime < 1) {
+        this.incrementPlayCount();
+      }
     });
     this.audio.addEventListener('pause', () => {
       this.isPlaying = false;
@@ -137,7 +142,6 @@ class WinampPlayer {
       this.audio.muted = true; // Ensure muted for autoplay policy
       this.audio.play().then(() => {
         this.audio.muted = false; // Unmute once playing
-        this.incrementPlayCount();
       }).catch(err => console.log('Autoplay error:', err.message));
     }, 100);
   }
