@@ -183,9 +183,36 @@ class WinampPlayer {
   }
 
   play() {
+    // Initialize audio context on first play (after user interaction)
+    if (!this.audioContextInitialized) {
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        this.audioContext = new AudioContextClass();
+        
+        this.analyser = this.audioContext.createAnalyser();
+        this.analyser.fftSize = 256;
+        this.analyser.smoothingTimeConstant = 0.85;
+        
+        // Try to connect the analyser
+        if (typeof this.audioContext.createMediaElementAudioSource === 'function') {
+          const source = this.audioContext.createMediaElementAudioSource(this.audio);
+          source.connect(this.analyser);
+          this.analyser.connect(this.audioContext.destination);
+        }
+        this.audioContextInitialized = true;
+      } catch (e) {
+        console.log('Audio context init error:', e);
+      }
+    }
+    
+    // Resume audio context if it's suspended
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      this.audioContext.resume();
+    }
+    
     this.audio.muted = false;
     this.audio.play().catch(err => {
-      console.error('Play error:', err);
+      console.log('Play error:', err);
     });
     this.playCount++;
     localStorage.setItem('playCount', this.playCount);
@@ -284,12 +311,9 @@ class WinampPlayer {
     // Set canvas resolution
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
-    
-    let animationPhase = 0;
 
     const draw = () => {
       requestAnimationFrame(draw);
-      animationPhase += 0.05;
 
       ctx.fillStyle = '#000';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -300,18 +324,26 @@ class WinampPlayer {
       // Check if audio is actually playing
       const isAudioPlaying = this.audio && !this.audio.paused && this.audio.currentTime > 0;
       
+      // Try to get frequency data
+      let frequencyData = null;
+      if (isAudioPlaying && this.analyser) {
+        try {
+          frequencyData = new Uint8Array(this.analyser.frequencyBinCount);
+          this.analyser.getByteFrequencyData(frequencyData);
+        } catch (e) {
+          // Silent fail
+        }
+      }
+      
       for (let i = 0; i < barCount; i++) {
         let barHeight = 0;
         
-        if (isAudioPlaying) {
-          // When playing, show animated bars with slight variations
-          const pulsePhase = animationPhase + (i / barCount) * Math.PI * 2;
-          const basePulse = Math.sin(pulsePhase) * 0.5 + 0.5;
-          const variance = Math.sin(pulsePhase * 1.5 + i * 0.3) * 0.25;
-          barHeight = (basePulse + variance) * canvas.height * 0.85;
-          barHeight = Math.max(barHeight, 8); // Minimum height when playing
+        if (frequencyData) {
+          // Use actual frequency data
+          const dataIndex = Math.floor((i / barCount) * frequencyData.length);
+          barHeight = (frequencyData[dataIndex] / 255) * canvas.height * 0.95;
         }
-        // When idle, barHeight stays at 0
+        // If no frequency data or not playing, barHeight stays at 0
         
         ctx.fillStyle = '#00ff00';
         ctx.fillRect(i * barWidth + 2, canvas.height - barHeight, barWidth - 4, barHeight);
