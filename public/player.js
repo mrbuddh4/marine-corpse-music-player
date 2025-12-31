@@ -7,7 +7,7 @@ class WinampPlayer {
     this.isShuffle = false;
     this.repeatMode = 0; // 0: no repeat, 1: repeat all, 2: repeat one
     this.shuffledIndices = [];
-    this.playCount = parseInt(localStorage.getItem('playCount')) || 0;
+    this.playCount = 0;
     this.audioContext = null;
     this.analyser = null;
     this.audioContextInitialized = false;
@@ -15,7 +15,7 @@ class WinampPlayer {
     this.initElements();
     this.setupEventListeners();
     this.loadPlaylists();
-    this.updatePlayCountDisplay();
+    this.fetchPlayCount();
   }
 
   initElements() {
@@ -34,6 +34,28 @@ class WinampPlayer {
     this.albumArt = document.getElementById('albumArt');
     this.lyricsDisplay = document.getElementById('lyrics');
     this.playCountDisplay = document.getElementById('playCount');
+  }
+
+  async fetchPlayCount() {
+    try {
+      const response = await fetch('/api/play-count');
+      const data = await response.json();
+      this.playCount = data.count || 0;
+      this.updatePlayCountDisplay();
+    } catch (error) {
+      console.error('Failed to fetch play count:', error);
+    }
+  }
+
+  async incrementPlayCount() {
+    try {
+      const response = await fetch('/api/play-count', { method: 'POST' });
+      const data = await response.json();
+      this.playCount = data.count || 0;
+      this.updatePlayCountDisplay();
+    } catch (error) {
+      console.error('Failed to increment play count:', error);
+    }
   }
 
   async loadPlaylists() {
@@ -212,9 +234,7 @@ class WinampPlayer {
     this.audio.play().catch(err => {
       console.log('Play error:', err);
     });
-    this.playCount++;
-    localStorage.setItem('playCount', this.playCount);
-    this.updatePlayCountDisplay();
+    this.incrementPlayCount();
   }
 
   updatePlayCountDisplay() {
