@@ -2,6 +2,7 @@ class WinampPlayer {
   constructor() {
     console.log('WinampPlayer initializing...');
     this.audio = document.getElementById('audioPlayer');
+    this.audio.muted = true; // Start muted for autoplay policy
     this.currentPlaylist = [];
     this.currentTrackIndex = 0;
     this.isPlaying = false;
