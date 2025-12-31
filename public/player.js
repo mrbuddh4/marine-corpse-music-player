@@ -8,7 +8,8 @@ class WinampPlayer {
     this.repeatMode = 0; // 0: no repeat, 1: repeat all, 2: repeat one
     this.shuffledIndices = [];
     this.playCount = parseInt(localStorage.getItem('playCount')) || 0;
-    this.contextInitStarted = false;
+    this.audioContext = null;
+    this.analyser = null;
     
     this.initElements();
     this.setupEventListeners();
@@ -188,8 +189,7 @@ class WinampPlayer {
 
   play() {
     // Initialize audio context if needed
-    if (!this.audioContext && !this.contextInitStarted) {
-      this.contextInitStarted = true;
+    if (!this.audioContext) {
       try {
         this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
         this.analyser = this.audioContext.createAnalyser();
@@ -202,6 +202,11 @@ class WinampPlayer {
       } catch (e) {
         console.error('Audio context error:', e);
       }
+    }
+    
+    // Resume audio context if suspended
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      this.audioContext.resume();
     }
     
     this.audio.play().catch(() => {});
