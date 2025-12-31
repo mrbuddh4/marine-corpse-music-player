@@ -11,6 +11,22 @@ class WinampPlayer {
     this.audioContext = null;
     this.analyser = null;
     
+    // Initialize audio context immediately (MUST happen before any audio plays)
+    try {
+      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      this.analyser = this.audioContext.createAnalyser();
+      this.analyser.fftSize = 256;
+      this.analyser.smoothingTimeConstant = 0.8;
+      
+      // Create source and connect IMMEDIATELY - this is critical
+      const source = this.audioContext.createMediaElementAudioSource(this.audio);
+      source.connect(this.analyser);
+      this.analyser.connect(this.audioContext.destination);
+      console.log('Audio context and source initialized in constructor');
+    } catch (e) {
+      console.error('Audio context init error:', e);
+    }
+    
     this.initElements();
     this.setupEventListeners();
     this.loadPlaylists();
@@ -71,28 +87,6 @@ class WinampPlayer {
   }
 
   setupEventListeners() {
-    // Initialize audio context on first user interaction
-    const initAudioContext = () => {
-      if (!this.audioContext) {
-        try {
-          this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-          this.analyser = this.audioContext.createAnalyser();
-          this.analyser.fftSize = 256;
-          this.analyser.smoothingTimeConstant = 0.8;
-          
-          const source = this.audioContext.createMediaElementAudioSource(this.audio);
-          source.connect(this.analyser);
-          this.analyser.connect(this.audioContext.destination);
-          console.log('Audio context initialized on first interaction');
-        } catch (e) {
-          console.error('Audio context init error:', e);
-        }
-      }
-      document.removeEventListener('click', initAudioContext);
-    };
-    
-    document.addEventListener('click', initAudioContext);
-    
     this.playBtn.addEventListener('click', () => this.togglePlay());
     this.prevBtn.addEventListener('click', () => this.previousTrack());
     this.nextBtn.addEventListener('click', () => this.nextTrack());
