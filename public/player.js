@@ -132,7 +132,12 @@ class WinampPlayer {
 
   startAutoplay() {
     // Autoplay when audio is ready - play while muted, then unmute
+    let autoplayTriggered = false;
+    
     const autoplayOnce = () => {
+      if (autoplayTriggered) return; // Prevent double-triggering
+      autoplayTriggered = true;
+      
       console.log('Canplay event: src=', this.audio.src, 'volume=', this.audio.volume);
       this.audio.muted = true; // Ensure muted
       this.audio.play().then(() => {
@@ -146,8 +151,9 @@ class WinampPlayer {
     
     // Fallback: also try after 2 seconds in case canplay doesn't fire
     setTimeout(() => {
-      if (!this.isPlaying) {
+      if (!autoplayTriggered && !this.isPlaying) {
         console.log('Fallback: src=', this.audio.src, 'volume=', this.audio.volume, 'isPlaying=', this.isPlaying);
+        autoplayTriggered = true;
         this.audio.muted = true;
         this.audio.play().then(() => {
           console.log('Fallback play succeeded, unmuting');
