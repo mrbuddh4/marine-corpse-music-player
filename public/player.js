@@ -34,7 +34,6 @@ class WinampPlayer {
     this.albumSelect = document.getElementById('albumSelect');
     this.songsList = document.getElementById('songsList');
     this.songTitle = document.getElementById('songTitle');
-    this.songArtist = document.getElementById('songArtist');
     this.songDuration = document.getElementById('songDuration');
     this.albumArt = document.getElementById('albumArt');
     this.lyricsDisplay = document.getElementById('lyrics');
@@ -163,7 +162,6 @@ class WinampPlayer {
     const track = this.currentPlaylist[index];
     this.audio.src = track.file;
     this.songTitle.textContent = track.title;
-    this.songArtist.textContent = this.currentAlbum?.artist || 'Unknown Artist';
     this.progressBar.max = track.duration;
     this.progressBar.value = 0;
     
