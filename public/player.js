@@ -174,8 +174,9 @@ class WinampPlayer {
 
   async loadLyrics(track) {
     try {
-      // Construct the lyrics file path using album name and full song title
-      const lyricsPath = `/lyrics/${this.currentAlbum.name}/${track.title}.txt`;
+      // Remove .mp3 extension from title for lyrics file lookup
+      const titleWithoutExtension = track.title.replace(/\.mp3$/, '');
+      const lyricsPath = `/lyrics/${this.currentAlbum.name}/${titleWithoutExtension}.txt`;
       const response = await fetch(lyricsPath);
       
       if (response.ok) {
