@@ -8,11 +8,9 @@ class WinampPlayer {
     this.isShuffle = false;
     this.repeatMode = 0; // 0: no repeat, 1: repeat all, 2: repeat one
     this.shuffledIndices = [];
-    this.playCount = 0;
     this.audioContext = null;
     this.analyser = null;
     this.audioContextInitialized = false;
-    this.playCountedForCurrentTrack = false;
     
     // Visualizer properties
     this.visualizerCanvas = null;
@@ -23,7 +21,6 @@ class WinampPlayer {
     this.initElements();
     this.setupEventListeners();
     this.loadPlaylists();
-    this.fetchPlayCount();
   }
 
   initElements() {
@@ -41,7 +38,6 @@ class WinampPlayer {
     this.songDuration = document.getElementById('songDuration');
     this.albumArt = document.getElementById('albumArt');
     this.lyricsDisplay = document.getElementById('lyrics');
-    this.playCountDisplay = document.getElementById('playCount');
     
     // Visualizer setup
     this.visualizerCanvas = document.getElementById('visualizer');
@@ -50,28 +46,6 @@ class WinampPlayer {
     // Set initial volume to 80%
     this.audio.volume = 0.8;
     this.volumeSlider.value = 80;
-  }
-
-  async fetchPlayCount() {
-    try {
-      const response = await fetch('/api/play-count');
-      const data = await response.json();
-      this.playCount = data.count || 0;
-      this.updatePlayCountDisplay();
-    } catch (error) {
-      console.error('Failed to fetch play count:', error);
-    }
-  }
-
-  async incrementPlayCount() {
-    try {
-      const response = await fetch('/api/play-count', { method: 'POST' });
-      const data = await response.json();
-      this.playCount = data.count || 0;
-      this.updatePlayCountDisplay();
-    } catch (error) {
-      console.error('Failed to increment play count:', error);
-    }
   }
 
   async loadPlaylists() {
@@ -119,12 +93,6 @@ class WinampPlayer {
     this.audio.addEventListener('play', () => {
       this.isPlaying = true;
       this.playBtn.textContent = '⏸';
-      
-      // Only count as a play if starting from the beginning and not already counted
-      if (this.audio.currentTime < 1 && !this.playCountedForCurrentTrack) {
-        this.playCountedForCurrentTrack = true;
-        this.incrementPlayCount();
-      }
     });
     this.audio.addEventListener('pause', () => {
       this.isPlaying = false;
@@ -198,7 +166,6 @@ class WinampPlayer {
     this.songArtist.textContent = this.currentAlbum?.artist || 'Unknown Artist';
     this.progressBar.max = track.duration;
     this.progressBar.value = 0;
-    this.playCountedForCurrentTrack = false;
     
     // Load audio data for visualizer
     this.loadAudioData(track);
@@ -270,10 +237,6 @@ class WinampPlayer {
     this.audio.play().catch(err => {
       console.log('Play error:', err);
     });
-  }
-
-  updatePlayCountDisplay() {
-    this.playCountDisplay.textContent = this.playCount;
   }
 
   pause() {
